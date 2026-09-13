@@ -1,0 +1,155 @@
+<!-- Hero -->
+<section class="hero">
+  <div class="container hero__inner">
+    <span class="eyebrow">{{ settings().gymName }}</span>
+    <h1 class="hero__title">
+      {{ heroTitle().lead }}
+      @if (heroTitle().accent) {
+        <br />
+        <span class="text-accent">{{ heroTitle().accent }}</span>
+      }
+    </h1>
+    <p class="hero__subtitle">{{ settings().heroSubtitle }}</p>
+    <div class="hero__actions">
+      <a app-button variant="primary" size="lg" routerLink="/planes">
+        Conocé nuestros planes
+        <app-icon name="arrow-right" [size]="18" />
+      </a>
+      <a app-button variant="secondary" size="lg" routerLink="/login">Ingresar</a>
+      <a
+        app-button
+        variant="ghost"
+        size="lg"
+        routerLink="/login"
+        [queryParams]="{ redirectTo: '/app' }"
+      >
+        <app-icon name="calendar" [size]="18" />
+        Agendate
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Benefits -->
+<section class="section" id="beneficios">
+  <div class="container">
+    <app-section-header
+      eyebrow="Por qué elegirnos"
+      title="Resultados reales, sin atajos"
+      subtitle="Todo lo que necesitás para entrenar bien y sostenerlo en el tiempo."
+    />
+    <div class="grid grid--4">
+      @for (item of benefits; track item.title) {
+        <article class="feature-card">
+          <span class="feature-card__icon"><app-icon [name]="item.icon" [size]="22" /></span>
+          <h3 class="feature-card__title">{{ item.title }}</h3>
+          <p class="feature-card__text">{{ item.description }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Methodology -->
+<section class="section section--alt" id="metodologia">
+  <div class="container">
+    <app-section-header
+      eyebrow="Metodología"
+      title="Así trabajamos"
+      subtitle="Un proceso simple de tres pasos que se adapta a vos."
+    />
+    <ol class="steps">
+      @for (step of methodSteps; track step.title; let i = $index) {
+        <li class="step">
+          <span class="step__number">0{{ i + 1 }}</span>
+          <h3 class="step__title">{{ step.title }}</h3>
+          <p class="step__text">{{ step.description }}</p>
+        </li>
+      }
+    </ol>
+  </div>
+</section>
+
+<!-- Gym features -->
+<section class="section" id="gimnasio">
+  <div class="container">
+    <app-section-header
+      eyebrow="El gimnasio"
+      title="Un espacio pensado para entrenar"
+      subtitle="Equipamiento, horarios y acompañamiento para que cada sesión valga la pena."
+    />
+    <div class="grid grid--2">
+      @for (item of gymFeatures; track item.title) {
+        <article class="feature-card feature-card--row">
+          <span class="feature-card__icon"><app-icon [name]="item.icon" [size]="22" /></span>
+          <div>
+            <h3 class="feature-card__title">{{ item.title }}</h3>
+            <p class="feature-card__text">{{ item.description }}</p>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Plans -->
+<section class="section section--alt" id="planes">
+  <div class="container">
+    <app-section-header
+      eyebrow="Planes"
+      title="Elegí cómo querés entrenar"
+      subtitle="Planes mensuales flexibles. Consultanos y te ayudamos a elegir el mejor para vos."
+      align="center"
+    />
+    <app-plans-list />
+    <div class="section__cta">
+      <a app-button variant="ghost" routerLink="/planes">
+        Ver todos los planes
+        <app-icon name="arrow-right" [size]="16" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials placeholder -->
+<section class="section" id="testimonios">
+  <div class="container">
+    <app-section-header
+      eyebrow="Testimonios"
+      title="Historias de proceso"
+      subtitle="Muy pronto vas a leer acá las experiencias de quienes entrenan con nosotros."
+      align="center"
+    />
+    <div class="grid grid--3">
+      @for (n of testimonialPlaceholders; track n) {
+        <article class="testimonial" aria-hidden="true">
+          <span class="testimonial__quote">“</span>
+          <div class="testimonial__lines">
+            <span class="testimonial__line"></span>
+            <span class="testimonial__line testimonial__line--short"></span>
+            <span class="testimonial__line"></span>
+          </div>
+          <div class="testimonial__author">
+            <span class="testimonial__avatar"></span>
+            <span class="testimonial__line testimonial__line--name"></span>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Contact + location -->
+<section class="section section--alt" id="contacto">
+  <div class="container">
+    <app-section-header
+      eyebrow="Contacto"
+      title="Vení a conocernos"
+      subtitle="Escribinos, pasá por el gym o seguinos en redes."
+    />
+    <div class="contact-grid">
+      <app-contact-info [settings]="settings()" />
+      <app-location-placeholder [address]="settings().address" />
+    </div>
+  </div>
+</section>

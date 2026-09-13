@@ -1,0 +1,64 @@
+@use 'breakpoints' as bp;
+
+// Layout primitives shared by public pages (sections, grids).
+.section {
+  padding-block: var(--space-16);
+
+  @include bp.up('md') {
+    padding-block: var(--space-20);
+  }
+}
+
+.section--alt {
+  background: var(--color-bg-elevated);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-8);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-4);
+
+  @include bp.up('md') {
+    gap: var(--space-6);
+  }
+}
+
+.grid--2 {
+  @include bp.up('md') {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.grid--3 {
+  @include bp.up('md') {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.grid--4 {
+  @include bp.up('sm') {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include bp.up('lg') {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+// Contact info + location side by side on large screens.
+.contact-grid {
+  display: grid;
+  gap: var(--space-8);
+
+  @include bp.up('lg') {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}

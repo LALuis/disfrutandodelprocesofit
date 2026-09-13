@@ -4,9 +4,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { homeRouteForRole } from '@core/auth/auth.models';
 import { AuthService } from '@core/auth/auth.service';
+import { GymSettingsService } from '@core/services/gym-settings.service';
 import { Button } from '@shared/components/button/button';
 import { Icon } from '@shared/components/icon/icon';
-import { GYM_BRAND } from '@shared/config/gym-brand';
+import { SocialLinks } from '@shared/components/social-links/social-links';
 
 interface NavItem {
   readonly label: string;
@@ -21,7 +22,7 @@ const NAV_ITEMS: readonly NavItem[] = [
 
 @Component({
   selector: 'app-public-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, Icon],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, Icon, SocialLinks],
   templateUrl: './public-layout.html',
   styleUrl: './public-layout.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,7 +31,7 @@ export class PublicLayout {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  protected readonly brand = GYM_BRAND;
+  protected readonly settings = inject(GymSettingsService).settings;
   protected readonly navItems = NAV_ITEMS;
   protected readonly menuOpen = signal(false);
   protected readonly currentYear = new Date().getFullYear();

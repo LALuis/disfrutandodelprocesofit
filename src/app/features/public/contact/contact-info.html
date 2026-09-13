@@ -1,0 +1,46 @@
+@if (whatsappHref()) {
+  <a
+    app-button
+    variant="primary"
+    size="lg"
+    class="contact__whatsapp"
+    [href]="whatsappHref()"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <app-icon name="whatsapp" [size]="20" />
+    Escribinos por WhatsApp
+  </a>
+}
+
+<dl class="contact__list">
+  @if (settings().phone) {
+    <div class="contact__item">
+      <dt><app-icon name="phone" [size]="18" /><span>Teléfono</span></dt>
+      <dd>
+        <a [href]="phoneHref()">{{ settings().phone }}</a>
+      </dd>
+    </div>
+  }
+  @if (settings().email) {
+    <div class="contact__item">
+      <dt><app-icon name="mail" [size]="18" /><span>Email</span></dt>
+      <dd>
+        <a [href]="mailHref()">{{ settings().email }}</a>
+      </dd>
+    </div>
+  }
+  <div class="contact__item">
+    <dt><app-icon name="map-pin" [size]="18" /><span>Dirección</span></dt>
+    <dd>{{ settings().address || 'Dirección a confirmar' }}</dd>
+  </div>
+  <div class="contact__item">
+    <dt><app-icon name="clock" [size]="18" /><span>Horarios</span></dt>
+    <dd>{{ settings().openingHours || 'Horarios a confirmar' }}</dd>
+  </div>
+</dl>
+
+<div class="contact__social">
+  <span class="contact__social-label">Seguinos</span>
+  <app-social-links [settings]="settings()" size="lg" />
+</div>

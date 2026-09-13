@@ -10,7 +10,7 @@ La aplicación tiene tres áreas:
 | Portal del alumno | `/app` | Usuarios con rol `STUDENT` |
 | Portal de administración | `/admin` | Usuarios con rol `ADMIN` |
 
-> **Estado actual: Milestone 1 (fundación).** Angular + Firebase configurados, emuladores, sistema de diseño, layout público con hero, autenticación con roles, layouts de ambos portales y guards. Las secciones funcionales (agenda, progreso, entrenamiento, nutrición, recetas, gestión de alumnos, etc.) llegan en los siguientes milestones.
+> **Estado actual: Milestone 2 (sitio público) completado.** Fundación (Angular + Firebase + emuladores + auth con roles + layouts) y sitio público completo: home con secciones, planes de membresía desde Firestore, contacto, redes sociales y configuración del gimnasio desde Firestore. Las secciones funcionales de los portales (gestión de alumnos, agenda, progreso, entrenamiento, nutrición, recetas) llegan en los siguientes milestones.
 
 ---
 
@@ -173,6 +173,9 @@ Los tests priorizan comportamiento con valor real, no "el componente existe":
 - `core/auth`: parseo de roles, mapeo de errores de Firebase a mensajes de usuario, `AuthService` (estado, claims, replay para guards).
 - `core/guards`: `authGuard`, `roleGuard`, `guestGuard` y saneo de `redirectTo` (evita open redirects).
 - `features/auth/login`: validación del formulario, navegación según rol, errores de credenciales.
+- `core/services`: normalización de documentos de planes y configuración del gimnasio (defaults seguros ante datos malformados), orden de planes.
+- `features/public/plans`: card de plan (precio, badge, CTA de WhatsApp) y lista con estados loading / error / vacío sobre `rxResource`.
+- `shared/utilities/contact-links`: construcción de enlaces `wa.me`, `tel:` y `mailto:`.
 - `functions/src/shared/auth.spec.ts`: `requireAuth` / `requireRole` devuelven los códigos `unauthenticated` / `permission-denied` correctos.
 
 Los tests de reglas de seguridad contra el emulador (`@firebase/rules-unit-testing`) se incorporan a partir del milestone de autenticación/usuarios, cuando las reglas cubran las colecciones reales.
@@ -264,21 +267,27 @@ Razonamiento:
     ├── styles/                  Design tokens, reset, tipografía, breakpoints, utilidades
     └── app/
         ├── core/
-        │   ├── firebase/        Tokens de inyección + provideFirebase()
+        │   ├── firebase/        Tokens de inyección, provideFirebase(), wrappers RxJS de Firestore
         │   ├── auth/            AuthService, modelos de rol, mapeo de errores
-        │   └── guards/          authGuard, roleGuard, guestGuard
+        │   ├── guards/          authGuard, roleGuard, guestGuard
+        │   └── services/        MembershipPlansService, GymSettingsService
         ├── shared/
-        │   ├── components/      Button, Card, PageHeader, FormField, Icon, Spinner,
+        │   ├── components/      Button, Card, PageHeader, FormField, Icon, Spinner, SocialLinks,
         │   │                    LoadingState, EmptyState, ErrorState, PortalShell
-        │   ├── config/          Branding por defecto
-        │   └── models/          Tipos compartidos (NavItem)
+        │   ├── config/          Branding estático de respaldo
+        │   ├── models/          MembershipPlan, GymSettings, NavItem
+        │   ├── pipes/           PricePipe (formato es-UY)
+        │   └── utilities/       Enlaces de contacto (WhatsApp, tel, mailto)
         └── features/
-            ├── public/          Layout público, home, placeholders de planes/contacto
+            ├── public/          Layout público, home (hero, beneficios, metodología, gimnasio,
+            │                    planes, testimonios, contacto), planes, contacto
             ├── auth/            Login, página "sin acceso"
             ├── student/         Layout del portal alumno (tabs móviles) + dashboard
             ├── admin/           Layout del portal admin (sidebar/drawer) + dashboard
             └── not-found/       404
 ```
+
+Datos públicos: la home, planes y contacto leen `gymSettings/public` y `membershipPlans` (solo `active == true`) en tiempo real mediante `onSnapshot`, con valores por defecto si el documento de configuración todavía no existe.
 
 Convenciones: nombres de archivo sin sufijo `.component` (guía de estilo Angular 20+), textos de UI en español rioplatense, código y comentarios en inglés.
 

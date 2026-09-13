@@ -1,48 +1,33 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { GymSettingsService } from '@core/services/gym-settings.service';
 import { Button } from '@shared/components/button/button';
 import { Icon } from '@shared/components/icon/icon';
-import { GYM_BRAND } from '@shared/config/gym-brand';
+import { LocationPlaceholder } from '../components/location-placeholder';
+import { SectionHeader } from '../components/section-header';
+import { ContactInfo } from '../contact/contact-info';
+import { PlansList } from '../plans/plans-list';
+import { BENEFITS, GYM_FEATURES, METHOD_STEPS } from './home-content';
 
-/**
- * Public home. Milestone 1 ships the hero; the remaining sections (benefits, methodology,
- * plans, testimonials, contact, location) are built in the public-site milestone.
- */
+/** Splits the hero title into a plain first sentence and an accented remainder. */
+export function splitHeroTitle(title: string): { lead: string; accent: string } {
+  const match = /^(.+?[.!?])\s+(.+)$/.exec(title.trim());
+  return match ? { lead: match[1], accent: match[2] } : { lead: title.trim(), accent: '' };
+}
+
 @Component({
   selector: 'app-home-page',
-  imports: [RouterLink, Button, Icon],
-  template: `
-    <section class="hero">
-      <div class="container hero__inner">
-        <span class="eyebrow">{{ brand.name }}</span>
-        <h1 class="hero__title">
-          Entrená con método.<br />
-          <span class="text-accent">Disfrutá el proceso.</span>
-        </h1>
-        <p class="hero__subtitle">{{ brand.tagline }}</p>
-        <div class="hero__actions">
-          <a app-button variant="primary" size="lg" routerLink="/planes">
-            Conocé nuestros planes
-            <app-icon name="arrow-right" [size]="18" />
-          </a>
-          <a app-button variant="secondary" size="lg" routerLink="/login">Ingresar</a>
-          <a
-            app-button
-            variant="ghost"
-            size="lg"
-            routerLink="/login"
-            [queryParams]="{ redirectTo: '/app' }"
-          >
-            <app-icon name="calendar" [size]="18" />
-            Agendate
-          </a>
-        </div>
-      </div>
-    </section>
-  `,
+  imports: [RouterLink, Button, Icon, SectionHeader, PlansList, ContactInfo, LocationPlaceholder],
+  templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomePage {
-  protected readonly brand = GYM_BRAND;
+  protected readonly settings = inject(GymSettingsService).settings;
+  protected readonly heroTitle = computed(() => splitHeroTitle(this.settings().heroTitle));
+
+  protected readonly benefits = BENEFITS;
+  protected readonly methodSteps = METHOD_STEPS;
+  protected readonly gymFeatures = GYM_FEATURES;
+  protected readonly testimonialPlaceholders = [1, 2, 3];
 }

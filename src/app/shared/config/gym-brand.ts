@@ -1,9 +1,8 @@
 /**
- * Static branding defaults. Contact details and social links will be loaded from the
- * `gymSettings` Firestore document in a later milestone; these values act as fallback.
+ * Static branding used where Firestore settings are not available yet (portal chrome,
+ * document titles). Everything else on the public site comes from `gymSettings/public`.
  */
 export const GYM_BRAND = {
   name: 'Disfrutando del proceso fit',
   shortName: 'DDP Fit',
-  tagline: 'Entrená con método, medí tu progreso y disfrutá el camino.',
 } as const;

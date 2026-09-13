@@ -1,0 +1,54 @@
+@if (plan().highlighted) {
+  <span class="plan-card__badge">
+    <app-icon name="sparkles" [size]="14" />
+    Más elegido
+  </span>
+}
+
+<header class="plan-card__header">
+  <h3 class="plan-card__name">{{ plan().name }}</h3>
+  @if (plan().description) {
+    <p class="plan-card__description">{{ plan().description }}</p>
+  }
+</header>
+
+<p class="plan-card__price">
+  <span class="plan-card__amount">{{ plan().price | appPrice: plan().currency }}</span>
+  <span class="plan-card__frequency">{{ frequencyLabel() }}</span>
+</p>
+
+@if (plan().features.length) {
+  <ul class="plan-card__features">
+    @for (feature of plan().features; track $index) {
+      <li>
+        <app-icon name="check" [size]="16" />
+        <span>{{ feature }}</span>
+      </li>
+    }
+  </ul>
+}
+
+<div class="plan-card__cta">
+  @if (contactUrl()) {
+    <a
+      app-button
+      [variant]="plan().highlighted ? 'primary' : 'secondary'"
+      [block]="true"
+      [href]="contactUrl()"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <app-icon name="whatsapp" [size]="18" />
+      Consultar por WhatsApp
+    </a>
+  } @else {
+    <a
+      app-button
+      [variant]="plan().highlighted ? 'primary' : 'secondary'"
+      [block]="true"
+      routerLink="/contacto"
+    >
+      Consultar
+    </a>
+  }
+</div>

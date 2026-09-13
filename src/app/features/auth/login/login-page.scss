@@ -1,0 +1,83 @@
+@use 'breakpoints' as bp;
+
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  min-height: 100dvh;
+  padding: var(--space-6) var(--space-4);
+  background:
+    radial-gradient(50% 40% at 50% 0%, rgba(255, 43, 176, 0.18), transparent 70%), var(--color-bg);
+}
+
+.login__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  align-self: flex-start;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+
+  &:hover {
+    color: var(--color-text);
+  }
+
+  @include bp.up('sm') {
+    align-self: center;
+  }
+}
+
+.login__card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.login__mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.login__title {
+  font-size: var(--text-2xl);
+}
+
+.login__subtitle {
+  font-size: var(--text-sm);
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.login__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-error-soft);
+  color: var(--color-error);
+  font-size: var(--text-sm);
+}
+
+.login__help {
+  margin-top: var(--space-6);
+  font-size: var(--text-sm);
+  text-align: center;
+}

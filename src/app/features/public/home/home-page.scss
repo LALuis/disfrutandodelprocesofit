@@ -1,0 +1,48 @@
+@use 'breakpoints' as bp;
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding-block: var(--space-16) var(--space-20);
+  background:
+    radial-gradient(60% 60% at 80% 10%, rgba(255, 43, 176, 0.22), transparent 70%),
+    radial-gradient(40% 50% at 10% 90%, rgba(255, 43, 176, 0.1), transparent 70%), var(--color-bg);
+
+  @include bp.up('md') {
+    padding-block: var(--space-24);
+  }
+}
+
+.hero__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 760px;
+}
+
+.hero__title {
+  font-size: clamp(2.25rem, 8vw, var(--text-5xl));
+  font-weight: var(--weight-black);
+  line-height: 1.05;
+}
+
+.hero__subtitle {
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+  max-width: 56ch;
+
+  @include bp.up('md') {
+    font-size: var(--text-xl);
+  }
+}
+
+.hero__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  @include bp.up('sm') {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

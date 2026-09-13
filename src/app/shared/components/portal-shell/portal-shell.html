@@ -1,0 +1,95 @@
+<header class="shell__topbar">
+  @if (mobileNav() === 'drawer') {
+    <button
+      type="button"
+      class="shell__icon-button shell__drawer-toggle"
+      [attr.aria-expanded]="drawerOpen()"
+      aria-controls="portal-drawer"
+      [attr.aria-label]="drawerOpen() ? 'Cerrar menú' : 'Abrir menú'"
+      (click)="toggleDrawer()"
+    >
+      <app-icon [name]="drawerOpen() ? 'close' : 'menu'" [size]="22" />
+    </button>
+  }
+
+  <a class="shell__brand" routerLink="/">
+    <span class="shell__brand-mark"><app-icon name="dumbbell" [size]="18" /></span>
+    <span class="shell__brand-text">
+      <span class="shell__brand-name">{{ brand.shortName }}</span>
+      <span class="shell__brand-area">{{ areaLabel() }}</span>
+    </span>
+  </a>
+
+  <div class="shell__user">
+    @if (user(); as currentUser) {
+      <span class="shell__user-email" [title]="currentUser.email ?? ''">
+        {{ currentUser.displayName || currentUser.email }}
+      </span>
+    }
+    <button
+      type="button"
+      class="shell__icon-button"
+      aria-label="Cerrar sesión"
+      title="Cerrar sesión"
+      (click)="signOut()"
+    >
+      <app-icon name="log-out" [size]="20" />
+    </button>
+  </div>
+</header>
+
+<div class="shell__body">
+  <nav
+    id="portal-drawer"
+    class="shell__sidebar"
+    [class.shell__sidebar--open]="drawerOpen()"
+    [attr.aria-label]="'Navegación de ' + areaLabel()"
+  >
+    <ul class="shell__nav">
+      @for (item of navItems(); track item.path) {
+        <li>
+          <a
+            class="shell__nav-link"
+            [routerLink]="item.path"
+            routerLinkActive="shell__nav-link--active"
+            [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+            ariaCurrentWhenActive="page"
+          >
+            <app-icon [name]="item.icon" [size]="20" />
+            <span>{{ item.label }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  @if (mobileNav() === 'drawer' && drawerOpen()) {
+    <button
+      type="button"
+      class="shell__backdrop"
+      aria-label="Cerrar menú"
+      (click)="toggleDrawer()"
+    ></button>
+  }
+
+  <main class="shell__content">
+    <ng-content />
+  </main>
+</div>
+
+@if (mobileNav() === 'tabs') {
+  <nav class="shell__tabs" [attr.aria-label]="'Navegación de ' + areaLabel()">
+    @for (item of navItems(); track item.path) {
+      <a
+        class="shell__tab"
+        [routerLink]="item.path"
+        routerLinkActive="shell__tab--active"
+        [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+        ariaCurrentWhenActive="page"
+      >
+        <app-icon [name]="item.icon" [size]="22" />
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+}

@@ -1,0 +1,260 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+// ---- Top bar --------------------------------------------------------------
+
+.shell__topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--header-height);
+  padding-inline: var(--space-4);
+  background: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.shell__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.shell__brand-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.shell__brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.shell__brand-name {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+}
+
+.shell__brand-area {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.shell__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+  min-width: 0;
+}
+
+.shell__user-email {
+  display: none;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @include bp.up('sm') {
+    display: block;
+  }
+}
+
+.shell__icon-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+
+  &:hover {
+    background: var(--color-surface-hover);
+  }
+}
+
+.shell__drawer-toggle {
+  @include bp.up('lg') {
+    display: none;
+  }
+}
+
+// ---- Body: sidebar + content -----------------------------------------------
+
+.shell__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.shell__sidebar {
+  display: none;
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  padding: var(--space-4);
+  border-right: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+
+  @include bp.up('lg') {
+    display: block;
+    position: sticky;
+    top: var(--header-height);
+    height: calc(100dvh - var(--header-height));
+    overflow-y: auto;
+  }
+}
+
+// Drawer mode: the sidebar slides in from the left on small screens.
+:host:not(.shell--tabs) .shell__sidebar {
+  @include bp.down('lg') {
+    display: block;
+    position: fixed;
+    top: var(--header-height);
+    bottom: 0;
+    left: 0;
+    z-index: var(--z-dropdown);
+    transform: translateX(-100%);
+    // visibility keeps the closed drawer out of the tab order and the accessibility tree.
+    visibility: hidden;
+    transition:
+      transform var(--transition-base),
+      visibility 0s linear var(--transition-base);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+:host:not(.shell--tabs) .shell__sidebar--open {
+  @include bp.down('lg') {
+    transform: translateX(0);
+    visibility: visible;
+    transition-delay: 0s;
+  }
+}
+
+.shell__backdrop {
+  position: fixed;
+  inset: var(--header-height) 0 0 0;
+  z-index: calc(var(--z-dropdown) - 1);
+  background: var(--color-overlay);
+
+  @include bp.up('lg') {
+    display: none;
+  }
+}
+
+.shell__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.shell__nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-weight: var(--weight-medium);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover {
+    color: var(--color-text);
+    background: var(--color-surface-hover);
+  }
+}
+
+.shell__nav-link--active {
+  color: var(--color-text);
+  background: var(--color-accent-soft);
+
+  app-icon {
+    color: var(--color-accent);
+  }
+}
+
+.shell__content {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-4);
+  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+
+  @include bp.up('md') {
+    padding: var(--space-6);
+  }
+
+  @include bp.up('lg') {
+    padding: var(--space-8);
+  }
+}
+
+:host(.shell--tabs) .shell__content {
+  @include bp.down('lg') {
+    padding-bottom: calc(var(--bottom-nav-height) + var(--space-4) + env(safe-area-inset-bottom));
+  }
+}
+
+// ---- Bottom tabs (student, mobile) ----------------------------------------
+
+.shell__tabs {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-header);
+  display: flex;
+  justify-content: space-around;
+  min-height: var(--bottom-nav-height);
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--color-bg-elevated);
+  border-top: 1px solid var(--color-border);
+
+  @include bp.up('lg') {
+    display: none;
+  }
+}
+
+.shell__tab {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.shell__tab--active {
+  color: var(--color-accent);
+}

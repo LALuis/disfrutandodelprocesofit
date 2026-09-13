@@ -1,0 +1,86 @@
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a routerLink="/" class="brand" aria-label="Ir al inicio">
+      <span class="brand__mark"><app-icon name="dumbbell" [size]="20" /></span>
+      <span class="brand__name">{{ brand.name }}</span>
+    </a>
+
+    <nav class="site-nav site-nav--desktop" aria-label="Principal">
+      <ul class="site-nav__list">
+        @for (item of navItems; track item.path) {
+          <li>
+            <a
+              class="site-nav__link"
+              [routerLink]="item.path"
+              routerLinkActive="site-nav__link--active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              ariaCurrentWhenActive="page"
+            >
+              {{ item.label }}
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      @if (isAuthenticated()) {
+        <a app-button variant="primary" size="sm" [routerLink]="portalLink()">Mi portal</a>
+      } @else {
+        <a app-button variant="primary" size="sm" routerLink="/login">
+          <app-icon name="log-in" [size]="16" />
+          Ingresar
+        </a>
+      }
+      <button
+        type="button"
+        class="menu-toggle"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="mobile-menu"
+        [attr.aria-label]="menuOpen() ? 'Cerrar menú' : 'Abrir menú'"
+        (click)="toggleMenu()"
+      >
+        <app-icon [name]="menuOpen() ? 'close' : 'menu'" [size]="24" />
+      </button>
+    </div>
+  </div>
+
+  <nav
+    id="mobile-menu"
+    class="site-nav site-nav--mobile"
+    [class.site-nav--open]="menuOpen()"
+    aria-label="Principal (móvil)"
+    [attr.aria-hidden]="!menuOpen()"
+  >
+    <ul class="site-nav__list">
+      @for (item of navItems; track item.path) {
+        <li>
+          <a
+            class="site-nav__link"
+            [routerLink]="item.path"
+            routerLinkActive="site-nav__link--active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            [tabindex]="menuOpen() ? 0 : -1"
+          >
+            {{ item.label }}
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
+</header>
+
+<main class="site-main" id="contenido">
+  <router-outlet />
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div>
+      <p class="site-footer__brand">{{ brand.name }}</p>
+      <p class="site-footer__tagline text-muted">{{ brand.tagline }}</p>
+    </div>
+    <p class="site-footer__copy text-muted">© {{ currentYear }} {{ brand.name }}</p>
+  </div>
+</footer>

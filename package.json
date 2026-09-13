@@ -1,0 +1,56 @@
+{
+  "name": "disfrutandodelprocesofit",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "dev": "npm run functions:build && concurrently -k -n emulators,angular -c magenta,cyan \"npm:firebase:emulators\" \"npm:start\"",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "lint": "ng lint && npm --prefix functions run lint",
+    "test": "ng test",
+    "test:functions": "npm --prefix functions test",
+    "test:all": "npm test && npm run test:functions",
+    "functions:build": "npm --prefix functions run build",
+    "functions:watch": "npm --prefix functions run watch",
+    "firebase:emulators": "firebase emulators:start --only auth,firestore,functions,storage",
+    "firebase:emulators:persist": "firebase emulators:start --only auth,firestore,functions,storage --import=./.emulator-data --export-on-exit",
+    "seed": "tsx scripts/seed/seed.ts",
+    "postinstall": "npm --prefix functions install"
+  },
+  "private": true,
+  "packageManager": "npm@11.19.0",
+  "dependencies": {
+    "@angular/common": "^22.1.0",
+    "@angular/compiler": "^22.1.0",
+    "@angular/core": "^22.1.0",
+    "@angular/forms": "^22.1.0",
+    "@angular/platform-browser": "^22.1.0",
+    "@angular/router": "^22.1.0",
+    "firebase": "^12.19.0",
+    "lucide": "^1.45.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.1.8",
+    "@angular/cli": "^22.1.8",
+    "@angular/compiler-cli": "^22.1.0",
+    "@eslint/js": "^10.0.1",
+    "angular-eslint": "22.5.0",
+    "concurrently": "^10.0.5",
+    "eslint": "^10.9.1",
+    "firebase-admin": "^14.4.0",
+    "firebase-tools": "^15.30.0",
+    "jsdom": "^28.0.0",
+    "prettier": "^3.8.1",
+    "tsx": "^4.23.13",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "8.69.0",
+    "vitest": "^4.0.8"
+  },
+  "description": "Sitio web y plataforma de gestión del gimnasio Disfrutando del proceso fit",
+  "engines": {
+    "node": ">=22.22.3 || >=24.15.0"
+  }
+}

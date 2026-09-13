@@ -1,0 +1,12 @@
+rules_version = '2';
+
+// Milestone 1 baseline: nothing is readable or writable from clients yet.
+// Recipe images (public read, admin write) and private student files are added with their
+// milestones, each with its own explicit match block.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

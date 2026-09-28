@@ -1,0 +1,70 @@
+<app-page-header eyebrow="Mi ficha" title="Tu ficha" subtitle="Tus datos y tus últimas medidas.">
+  <a actions app-button variant="secondary" size="sm" routerLink="/app/cuenta">Mi cuenta</a>
+</app-page-header>
+
+@if (profile(); as p) {
+  <app-card class="mb-6">
+    <dl class="info">
+      <div>
+        <dt>Nombre</dt>
+        <dd>{{ fullName(p) }}</dd>
+      </div>
+      <div>
+        <dt>Email</dt>
+        <dd>{{ p.email }}</dd>
+      </div>
+      @if (p.phone) {
+        <div>
+          <dt>Teléfono</dt>
+          <dd>{{ p.phone }}</dd>
+        </div>
+      }
+      @if (p.birthDate) {
+        <div>
+          <dt>Nacimiento</dt>
+          <dd>{{ formatDate(p.birthDate) }}</dd>
+        </div>
+      }
+      @if (p.joinDate) {
+        <div>
+          <dt>Alumno desde</dt>
+          <dd>{{ formatDate(p.joinDate) }}</dd>
+        </div>
+      }
+    </dl>
+  </app-card>
+}
+
+@if (history.isLoading()) {
+  <app-loading-state message="Cargando mediciones…" />
+} @else if (history.error()) {
+  <app-error-state title="No pudimos cargar tus mediciones" (retry)="history.reload()" />
+} @else if (latest(); as latest) {
+  <section class="latest">
+    <h2 class="section-title">Última medición · {{ formatDate(latest.date) }}</h2>
+    <ul class="latest__grid">
+      @for (metric of latestMetrics(); track metric) {
+        <li class="latest__item">
+          <span class="latest__label">{{ meta[metric].label }}</span>
+          <span class="latest__value"
+            >{{ latest[metric] }} <small>{{ meta[metric].unit }}</small></span
+          >
+        </li>
+      }
+    </ul>
+    @if (latest.notes) {
+      <p class="text-muted latest__notes">{{ latest.notes }}</p>
+    }
+  </section>
+
+  <section>
+    <h2 class="section-title">Historial</h2>
+    <app-measurement-history [measurements]="history.value() ?? []" />
+  </section>
+} @else {
+  <app-empty-state
+    icon="ruler"
+    title="Todavía no hay mediciones"
+    description="Tu coach va a registrar tus medidas en la próxima evaluación."
+  />
+}

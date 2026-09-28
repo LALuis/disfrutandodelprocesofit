@@ -1,0 +1,57 @@
+<app-page-header
+  eyebrow="Administración"
+  title="Reservas"
+  [subtitle]="day.hasValue() ? totalBookings(day.value()) + ' reservas en el día' : ''"
+/>
+
+<app-date-nav [(date)]="date" />
+
+@if (day.isLoading()) {
+  <app-loading-state message="Cargando reservas…" />
+} @else if (day.error()) {
+  <app-error-state title="No pudimos cargar las reservas" (retry)="day.reload()" />
+} @else if (day.hasValue() && day.value().length) {
+  <div class="day">
+    @for (entry of day.value(); track entry.slot.id) {
+      <section class="slot" [class.slot--disabled]="!entry.slot.enabled">
+        <header class="slot__head">
+          <h2 class="slot__time">{{ entry.slot.startTime }}</h2>
+          <span class="text-muted"
+            >{{ entry.bookings.length }} / {{ entry.slot.capacity }} lugares</span
+          >
+          @if (!entry.slot.enabled) {
+            <app-badge tone="warning">Deshabilitado</app-badge>
+          } @else if (remaining(entry.slot) === 0) {
+            <app-badge tone="error">Completo</app-badge>
+          } @else {
+            <app-badge tone="success">{{ remaining(entry.slot) }} libres</app-badge>
+          }
+        </header>
+        @if (entry.bookings.length) {
+          <ul class="slot__people">
+            @for (booking of entry.bookings; track booking.userId) {
+              <li>
+                <a class="person" [routerLink]="['/admin/alumnos', booking.userId, 'reservas']">
+                  <app-user-avatar
+                    [firstName]="nameParts(booking.userName).first"
+                    [lastName]="nameParts(booking.userName).last"
+                    [size]="32"
+                  />
+                  <span>{{ booking.userName || booking.userId }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="slot__empty text-muted">Nadie reservó todavía.</p>
+        }
+      </section>
+    }
+  </div>
+} @else {
+  <app-empty-state
+    icon="calendar"
+    title="Sin horarios para este día"
+    description="Creá turnos en la sección Horarios para recibir reservas."
+  />
+}

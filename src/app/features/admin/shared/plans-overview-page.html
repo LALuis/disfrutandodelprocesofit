@@ -1,0 +1,43 @@
+<app-page-header eyebrow="Administración" [title]="config().title" [subtitle]="config().subtitle" />
+
+<div class="toolbar">
+  <label>
+    <span class="visually-hidden">Filtrar</span>
+    <select [value]="filter()" (change)="onFilter($event)">
+      <option value="all">Todos los alumnos activos</option>
+      <option value="without">Sin plan activo</option>
+    </select>
+  </label>
+</div>
+
+@if (students.isLoading()) {
+  <app-loading-state message="Cargando alumnos…" />
+} @else if (students.error()) {
+  <app-error-state title="No pudimos cargar los alumnos" (retry)="students.reload()" />
+} @else if (rows().length) {
+  <ul class="overview">
+    @for (row of rows(); track row.student.id) {
+      <li>
+        <a class="overview__row" [routerLink]="['/admin/alumnos', row.student.id, config().tab]">
+          <app-user-avatar [firstName]="row.student.firstName" [lastName]="row.student.lastName" />
+          <span class="overview__name">{{ fullName(row.student) }}</span>
+          <span class="overview__badges">
+            @if (row.featureOff) {
+              <app-badge tone="warning">Nutrición deshabilitada</app-badge>
+            }
+            <app-badge [tone]="row.hasPlan ? 'success' : 'neutral'">{{
+              row.hasPlan ? 'Plan activo' : 'Sin plan activo'
+            }}</app-badge>
+          </span>
+          <app-icon name="chevron-right" [size]="18" class="overview__chevron" />
+        </a>
+      </li>
+    }
+  </ul>
+} @else {
+  <app-empty-state
+    icon="clipboard"
+    title="Nada para mostrar"
+    description="No hay alumnos activos que coincidan con el filtro."
+  />
+}

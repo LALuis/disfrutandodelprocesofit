@@ -13,3 +13,23 @@ export function forbiddenError(
 ): HttpsError {
   return new HttpsError('permission-denied', message);
 }
+
+export function invalidArgumentError(message: string): HttpsError {
+  return new HttpsError('invalid-argument', message);
+}
+
+export function notFoundError(message: string): HttpsError {
+  return new HttpsError('not-found', message);
+}
+
+export function conflictError(message: string): HttpsError {
+  return new HttpsError('already-exists', message);
+}
+
+export function failedPreconditionError(message: string): HttpsError {
+  return new HttpsError('failed-precondition', message);
+}
+
+export function exhaustedError(message: string): HttpsError {
+  return new HttpsError('resource-exhausted', message);
+}

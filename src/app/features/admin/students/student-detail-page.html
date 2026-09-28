@@ -1,0 +1,89 @@
+<a class="back-link" routerLink="/admin/alumnos">
+  <app-icon name="arrow-left" [size]="16" />
+  Volver a alumnos
+</a>
+
+@if (profile.isLoading()) {
+  <app-loading-state message="Cargando alumno…" />
+} @else if (profile.error()) {
+  <app-error-state title="No pudimos cargar el alumno" (retry)="profile.reload()" />
+} @else if (profile.hasValue() && profile.value(); as student) {
+  <header class="detail">
+    <app-user-avatar [firstName]="student.firstName" [lastName]="student.lastName" [size]="56" />
+    <div class="detail__main">
+      <h1 class="detail__name">{{ fullName(student) }}</h1>
+      <p class="detail__meta text-muted">
+        {{ student.email }}
+        @if (student.phone) {
+          · {{ student.phone }}
+        }
+        @if (student.joinDate) {
+          · Desde {{ formatDate(student.joinDate) }}
+        }
+      </p>
+      <div class="detail__badges">
+        <app-badge [tone]="student.active ? 'success' : 'error'">
+          {{ student.active ? 'Activo' : 'Deshabilitado' }}
+        </app-badge>
+        @if (student.role === 'ADMIN') {
+          <app-badge tone="warning">Administrador</app-badge>
+        }
+        @if (student.features.nutritionEnabled) {
+          <app-badge tone="info">Nutrición</app-badge>
+        }
+        @if (student.features.recipesEnabled) {
+          <app-badge tone="accent">Recetario</app-badge>
+        }
+      </div>
+    </div>
+    @if (!isSelf(student)) {
+      <div class="page-actions">
+        <button
+          app-button
+          size="sm"
+          [variant]="student.active ? 'secondary' : 'primary'"
+          type="button"
+          [loading]="busy()"
+          (click)="toggleActive(student)"
+        >
+          <app-icon [name]="student.active ? 'ban' : 'circle-check'" [size]="16" />
+          {{ student.active ? 'Deshabilitar' : 'Habilitar' }}
+        </button>
+        <button
+          app-button
+          size="sm"
+          variant="ghost"
+          type="button"
+          [loading]="busy()"
+          (click)="toggleRole(student)"
+        >
+          <app-icon name="user-cog" [size]="16" />
+          {{ student.role === 'ADMIN' ? 'Quitar admin' : 'Hacer admin' }}
+        </button>
+      </div>
+    }
+  </header>
+
+  <nav class="tabs" aria-label="Secciones del alumno">
+    @for (tab of tabs; track tab.path) {
+      <a
+        class="tabs__link"
+        [routerLink]="tab.path"
+        routerLinkActive="tabs__link--active"
+        ariaCurrentWhenActive="page"
+      >
+        {{ tab.label }}
+      </a>
+    }
+  </nav>
+
+  <router-outlet />
+} @else {
+  <app-empty-state
+    icon="users"
+    title="Alumno no encontrado"
+    description="El perfil no existe o fue eliminado."
+  >
+    <a app-button variant="secondary" routerLink="/admin/alumnos">Volver a alumnos</a>
+  </app-empty-state>
+}

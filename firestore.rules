@@ -1,7 +1,8 @@
 rules_version = '2';
 
-// Milestone 1 baseline: deny by default, open only what the foundation needs.
-// Rules grow per collection as each feature lands; every change is covered by emulator tests.
+// Deny by default. Every collection below states explicitly who can read and write it.
+// Privileged mutations (accounts, roles, active flag, booking counters) only happen through
+// Cloud Functions with the Admin SDK, which bypasses these rules.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -18,14 +19,37 @@ service cloud.firestore {
       return hasRole('ADMIN');
     }
 
+    function isStudent() {
+      return hasRole('STUDENT');
+    }
+
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function profile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // Feature flags live on the caller's profile and are checked server-side here,
+    // never trusted from the client.
+    function hasFeature(feature) {
+      return isSignedIn() && profile().features[feature] == true;
+    }
+
+    function unchanged(field) {
+      return request.resource.data[field] == resource.data[field];
     }
 
     // ---- Public content ------------------------------------------------------
     match /membershipPlans/{planId} {
       allow read: if resource.data.active == true || isAdmin();
-      allow write: if isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.name is string
+        && request.resource.data.price is number
+        && request.resource.data.active is bool
+        && request.resource.data.displayOrder is number;
+      allow delete: if isAdmin();
     }
 
     match /gymSettings/{settingId} {
@@ -34,13 +58,72 @@ service cloud.firestore {
     }
 
     // ---- Users -------------------------------------------------------------
-    // Profiles are created by the createStudent Cloud Function (Admin SDK bypasses rules).
-    // Role and feature flags can never be changed through client writes.
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
+      // Accounts are created/deleted by createStudent (Admin SDK).
       allow create, delete: if false;
+      // Admins edit profile data but never identity, role or the active flag
+      // (those go through Cloud Functions so Auth stays in sync).
       allow update: if isAdmin()
-        && request.resource.data.role == resource.data.role;
+        && unchanged('role') && unchanged('email') && unchanged('active');
+      // Students may only keep their own phone up to date.
+      allow update: if isOwner(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['phone', 'updatedAt']);
+
+      // Append-only history: no updates, admins may delete a wrong entry.
+      match /measurements/{measurementId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isAdmin() && request.resource.data.date is string;
+        allow update: if false;
+        allow delete: if isAdmin();
+      }
+
+      match /trainingPlans/{planId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+
+      // Nutrition is a per-user feature: owners need the flag, admins always can.
+      match /nutritionPlans/{planId} {
+        allow read: if isAdmin() || (isOwner(userId) && hasFeature('nutritionEnabled'));
+        allow write: if isAdmin();
+      }
+
+      // Mirror of the student's bookings, written only by the booking functions.
+      match /bookings/{slotId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if false;
+      }
+    }
+
+    // ---- Schedule ----------------------------------------------------------
+    match /scheduleSlots/{slotId} {
+      allow read: if isSignedIn();
+      // Admins manage slots; the booking counter is owned by the Cloud Functions.
+      allow create: if isAdmin()
+        && request.resource.data.bookedCount == 0
+        && request.resource.data.capacity is number
+        && request.resource.data.capacity >= 1
+        && request.resource.data.startsAt is number
+        && request.resource.data.enabled is bool;
+      allow update: if isAdmin()
+        && unchanged('bookedCount')
+        && request.resource.data.capacity is number
+        && request.resource.data.capacity >= 1;
+      allow delete: if isAdmin() && resource.data.bookedCount == 0;
+
+      // Bookings are created/cancelled exclusively by createBooking/cancelBooking.
+      match /bookings/{bookingUserId} {
+        allow read: if isAdmin() || isOwner(bookingUserId);
+        allow write: if false;
+      }
+    }
+
+    // ---- Recipes -----------------------------------------------------------
+    match /recipes/{recipeId} {
+      allow read: if isAdmin()
+        || (isStudent() && resource.data.active == true && hasFeature('recipesEnabled'));
+      allow write: if isAdmin();
     }
 
     // Everything not matched above is denied.

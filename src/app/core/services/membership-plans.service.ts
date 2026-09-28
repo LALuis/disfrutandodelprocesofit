@@ -1,15 +1,23 @@
 import { inject, Injectable } from '@angular/core';
 import {
   collection,
-  FirestoreDataConverter,
+  deleteDoc,
+  doc,
+  orderBy,
   query,
-  QueryDocumentSnapshot,
+  serverTimestamp,
+  setDoc,
   where,
 } from 'firebase/firestore';
 import { map, Observable, shareReplay } from 'rxjs';
-import { collectionData$ } from '@core/firebase/firestore.utils';
+import { collectionData$, converterFor } from '@core/firebase/firestore.utils';
 import { FIRESTORE } from '@core/firebase/firebase.tokens';
-import { MembershipPlan, PLAN_FREQUENCIES, PlanFrequency } from '@shared/models/membership-plan';
+import {
+  MembershipPlan,
+  MembershipPlanInput,
+  PLAN_FREQUENCIES,
+  PlanFrequency,
+} from '@shared/models/membership-plan';
 
 export const MEMBERSHIP_PLANS_COLLECTION = 'membershipPlans';
 
@@ -34,11 +42,7 @@ export function toMembershipPlan(id: string, data: Record<string, unknown>): Mem
   };
 }
 
-const membershipPlanConverter: FirestoreDataConverter<MembershipPlan> = {
-  toFirestore: ({ id: _id, ...plan }) => plan,
-  fromFirestore: (snapshot: QueryDocumentSnapshot) =>
-    toMembershipPlan(snapshot.id, snapshot.data()),
-};
+const membershipPlanConverter = converterFor(toMembershipPlan);
 
 export function sortPlans(plans: readonly MembershipPlan[]): MembershipPlan[] {
   return [...plans].sort(
@@ -63,4 +67,26 @@ export class MembershipPlansService {
       where('active', '==', true),
     ),
   ).pipe(map(sortPlans), shareReplay({ bufferSize: 1, refCount: true }));
+
+  /** Every plan, including inactive ones (admin). */
+  readonly allPlans$: Observable<MembershipPlan[]> = collectionData$(
+    query(
+      collection(this.firestore, MEMBERSHIP_PLANS_COLLECTION).withConverter(
+        membershipPlanConverter,
+      ),
+      orderBy('displayOrder'),
+    ),
+  );
+
+  async save(input: MembershipPlanInput, planId?: string): Promise<string> {
+    const target = planId
+      ? doc(this.firestore, MEMBERSHIP_PLANS_COLLECTION, planId)
+      : doc(collection(this.firestore, MEMBERSHIP_PLANS_COLLECTION));
+    await setDoc(target, { ...input, updatedAt: serverTimestamp() }, { merge: true });
+    return target.id;
+  }
+
+  async remove(planId: string): Promise<void> {
+    await deleteDoc(doc(this.firestore, MEMBERSHIP_PLANS_COLLECTION, planId));
+  }
 }

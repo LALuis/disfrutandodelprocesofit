@@ -5,11 +5,11 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 /**
- * Styles native `<button>` and `<a>` elements so semantics and keyboard behaviour
+ * Styles native `<button>`, `<a>` and `<label>` elements so semantics and keyboard behaviour
  * stay untouched. Usage: `<button app-button variant="primary">Guardar</button>`.
  */
 @Component({
-  selector: 'button[app-button], a[app-button]',
+  selector: 'button[app-button], a[app-button], label[app-button]',
   templateUrl: './button.html',
   styleUrl: './button.scss',
   imports: [Spinner],

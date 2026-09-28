@@ -6,6 +6,7 @@ import { mapAuthError } from '@core/auth/auth-error.mapper';
 import { homeRouteForRole, UserRole } from '@core/auth/auth.models';
 import { AuthService } from '@core/auth/auth.service';
 import { isSafeRedirect, REDIRECT_QUERY_PARAM } from '@core/guards/redirect.utils';
+import { BrandLogo } from '@shared/components/brand-logo/brand-logo';
 import { Button } from '@shared/components/button/button';
 import { Card } from '@shared/components/card/card';
 import { FormField } from '@shared/components/form-field/form-field';
@@ -15,7 +16,7 @@ import { GYM_BRAND } from '@shared/config/gym-brand';
 /** Shared login for students and admins; the destination is decided by the user's role. */
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule, RouterLink, Button, Card, FormField, Icon],
+  imports: [ReactiveFormsModule, RouterLink, BrandLogo, Button, Card, FormField, Icon],
   templateUrl: './login-page.html',
   styleUrl: './login-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,6 +30,9 @@ export class LoginPage {
   protected readonly brand = GYM_BRAND;
   protected readonly submitting = signal(false);
   protected readonly errorMessage = signal('');
+  /** "Olvidé mi contraseña" mode reuses the email field. */
+  protected readonly resetMode = signal(false);
+  protected readonly resetSent = signal(false);
 
   protected readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -63,6 +67,31 @@ export class LoginPage {
         this.authService.authState$.pipe(filter((current) => current !== null)),
       );
       await this.router.navigateByUrl(this.destinationFor(user.role));
+    } catch (error) {
+      this.errorMessage.set(mapAuthError(error));
+    } finally {
+      this.submitting.set(false);
+    }
+  }
+
+  protected toggleResetMode(): void {
+    this.resetMode.update((v) => !v);
+    this.resetSent.set(false);
+    this.errorMessage.set('');
+  }
+
+  protected async sendReset(): Promise<void> {
+    const email = this.form.controls.email;
+    email.markAsTouched();
+    if (email.invalid || this.submitting()) {
+      return;
+    }
+    this.submitting.set(true);
+    this.errorMessage.set('');
+    try {
+      await this.authService.sendPasswordReset(email.value);
+      // Same message whether or not the account exists: never confirm registered emails.
+      this.resetSent.set(true);
     } catch (error) {
       this.errorMessage.set(mapAuthError(error));
     } finally {

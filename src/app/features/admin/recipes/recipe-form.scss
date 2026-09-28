@@ -1,0 +1,44 @@
+.image {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.image__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.image__preview,
+.image__placeholder {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+}
+
+.image__placeholder {
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--color-border-strong);
+  color: var(--color-text-subtle);
+}
+
+.image__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.image__upload {
+  cursor: pointer;
+}
+
+.image__hint {
+  font-size: var(--text-xs);
+}
+
+fieldset app-form-field {
+  flex: 1;
+  min-width: 140px;
+}

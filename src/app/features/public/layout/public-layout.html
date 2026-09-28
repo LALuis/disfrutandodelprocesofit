@@ -3,7 +3,7 @@
 <header class="site-header">
   <div class="container site-header__inner">
     <a routerLink="/" class="brand" aria-label="Ir al inicio">
-      <span class="brand__mark"><app-icon name="dumbbell" [size]="20" /></span>
+      <app-brand-logo class="brand__mark" [size]="40" [eager]="true" />
       <span class="brand__name">{{ settings().gymName }}</span>
     </a>
 
@@ -80,6 +80,7 @@
 <footer class="site-footer">
   <div class="container site-footer__inner">
     <div class="site-footer__brand">
+      <app-brand-logo [size]="64" />
       <p class="site-footer__name">{{ settings().gymName }}</p>
       <p class="site-footer__tagline text-muted">{{ settings().heroSubtitle }}</p>
       <app-social-links [settings]="settings()" />

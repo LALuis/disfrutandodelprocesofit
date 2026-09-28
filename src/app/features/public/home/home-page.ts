@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { GymSettingsService } from '@core/services/gym-settings.service';
+import { BrandLogo } from '@shared/components/brand-logo/brand-logo';
 import { Button } from '@shared/components/button/button';
 import { Icon } from '@shared/components/icon/icon';
 import { LocationPlaceholder } from '../components/location-placeholder';
@@ -17,7 +18,16 @@ export function splitHeroTitle(title: string): { lead: string; accent: string } 
 
 @Component({
   selector: 'app-home-page',
-  imports: [RouterLink, Button, Icon, SectionHeader, PlansList, ContactInfo, LocationPlaceholder],
+  imports: [
+    RouterLink,
+    BrandLogo,
+    Button,
+    Icon,
+    SectionHeader,
+    PlansList,
+    ContactInfo,
+    LocationPlaceholder,
+  ],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

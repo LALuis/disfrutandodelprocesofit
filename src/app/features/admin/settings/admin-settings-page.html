@@ -1,0 +1,40 @@
+<app-page-header
+  eyebrow="Administración"
+  title="Configuración"
+  subtitle="Datos del gimnasio que se muestran en el sitio público."
+/>
+
+<app-card>
+  @if (errorMessage()) {
+    <p class="form__error" role="alert">
+      <app-icon name="alert-triangle" [size]="16" />
+      {{ errorMessage() }}
+    </p>
+  }
+  <form class="form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <div class="form__grid">
+      @for (field of fields; track field.key) {
+        <app-form-field
+          [label]="field.label"
+          [inputId]="'gs-' + field.key"
+          [error]="error(field.key)"
+          [hint]="field.hint ?? ''"
+        >
+          @if (field.type === 'textarea') {
+            <textarea [id]="'gs-' + field.key" [formControlName]="field.key" rows="2"></textarea>
+          } @else {
+            <input
+              [id]="'gs-' + field.key"
+              [type]="field.type"
+              [formControlName]="field.key"
+              autocomplete="off"
+            />
+          }
+        </app-form-field>
+      }
+    </div>
+    <div class="form__actions">
+      <button app-button type="submit" [loading]="submitting()">Guardar configuración</button>
+    </div>
+  </form>
+</app-card>

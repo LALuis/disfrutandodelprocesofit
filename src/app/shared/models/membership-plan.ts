@@ -16,6 +16,8 @@ export interface MembershipPlan {
   readonly displayOrder: number;
 }
 
+export type MembershipPlanInput = Omit<MembershipPlan, 'id'>;
+
 export const PLAN_FREQUENCY_LABELS: Record<PlanFrequency, string> = {
   monthly: 'por mes',
   quarterly: 'por trimestre',

@@ -1,24 +1,23 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Card } from '@shared/components/card/card';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+import { DashboardStatsService } from '@core/services/dashboard-stats.service';
+import { Button } from '@shared/components/button/button';
+import { ErrorState } from '@shared/components/error-state/error-state';
+import { Icon } from '@shared/components/icon/icon';
+import { LoadingState } from '@shared/components/loading-state/loading-state';
 import { PageHeader } from '@shared/components/page-header/page-header';
+import { StatCard } from '@shared/components/stat-card/stat-card';
 
-/** Admin home. Summary cards (students, bookings, slots) arrive with their milestones. */
 @Component({
   selector: 'app-admin-dashboard-page',
-  imports: [PageHeader, Card],
-  template: `
-    <app-page-header
-      eyebrow="Administración"
-      title="Dashboard"
-      subtitle="Resumen de la actividad del gimnasio."
-    />
-    <app-card>
-      <p class="text-muted">
-        Acá vas a ver alumnos activos, reservas de hoy y disponibilidad de horarios. Estas métricas
-        se habilitan junto con cada módulo.
-      </p>
-    </app-card>
-  `,
+  imports: [RouterLink, PageHeader, StatCard, Button, Icon, LoadingState, ErrorState],
+  templateUrl: './admin-dashboard-page.html',
+  styleUrl: './admin-dashboard-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminDashboardPage {}
+export class AdminDashboardPage {
+  private readonly statsService = inject(DashboardStatsService);
+
+  protected readonly stats = rxResource({ stream: () => this.statsService.stats$() });
+}

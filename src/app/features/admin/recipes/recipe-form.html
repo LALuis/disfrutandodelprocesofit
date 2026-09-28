@@ -1,0 +1,123 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="form__grid">
+    <app-form-field label="Título" inputId="rc-title" [error]="error('title')">
+      <input id="rc-title" type="text" formControlName="title" />
+    </app-form-field>
+    <app-form-field label="Categoría" inputId="rc-category" [error]="error('category')">
+      <select id="rc-category" formControlName="category">
+        @for (category of categories; track category) {
+          <option [value]="category">{{ categoryLabels[category] }}</option>
+        }
+      </select>
+    </app-form-field>
+  </div>
+
+  <app-form-field label="Descripción" inputId="rc-description" [error]="error('description')">
+    <textarea id="rc-description" formControlName="description" rows="2"></textarea>
+  </app-form-field>
+
+  <div class="image">
+    <span class="image__label">Imagen</span>
+    @if (image().imageUrl) {
+      <img class="image__preview" [src]="image().imageUrl" alt="" />
+    } @else {
+      <div class="image__placeholder"><app-icon name="image-plus" [size]="28" /></div>
+    }
+    <div class="image__actions">
+      <label app-button variant="secondary" size="sm" class="image__upload">
+        <app-icon name="image-plus" [size]="16" />
+        {{ uploading() ? 'Subiendo…' : image().imageUrl ? 'Cambiar imagen' : 'Subir imagen' }}
+        <input
+          class="visually-hidden"
+          type="file"
+          accept="image/*"
+          [disabled]="uploading()"
+          (change)="onFileSelected($event)"
+        />
+      </label>
+      @if (image().imageUrl) {
+        <button app-button variant="ghost" size="sm" type="button" (click)="removeImage()">
+          Quitar
+        </button>
+      }
+    </div>
+    @if (uploadError()) {
+      <p class="form__error" role="alert">{{ uploadError() }}</p>
+    }
+    <p class="image__hint text-muted">JPG, PNG o WebP de hasta 5 MB.</p>
+  </div>
+
+  <div class="form__grid form__grid--3">
+    <app-form-field
+      label="Tiempo de preparación (min)"
+      inputId="rc-time"
+      [error]="error('preparationTime')"
+    >
+      <input
+        id="rc-time"
+        type="number"
+        min="1"
+        inputmode="numeric"
+        formControlName="preparationTime"
+      />
+    </app-form-field>
+    <app-form-field
+      label="Etiquetas"
+      inputId="rc-tags"
+      [error]="error('tags')"
+      hint="Separadas por coma."
+    >
+      <input id="rc-tags" type="text" formControlName="tags" placeholder="rápido, sin gluten" />
+    </app-form-field>
+  </div>
+
+  <fieldset>
+    <legend>Información nutricional (opcional, por porción)</legend>
+    @for (field of numericFields; track field.key) {
+      <app-form-field
+        [label]="field.label + ' (' + field.unit + ')'"
+        [inputId]="'rc-' + field.key"
+        [error]="error(field.key)"
+      >
+        <input
+          [id]="'rc-' + field.key"
+          type="number"
+          min="0"
+          step="0.1"
+          inputmode="decimal"
+          [formControlName]="field.key"
+        />
+      </app-form-field>
+    }
+  </fieldset>
+
+  <app-form-field
+    label="Ingredientes"
+    inputId="rc-ingredients"
+    [error]="error('ingredients')"
+    hint="Uno por línea."
+  >
+    <textarea id="rc-ingredients" formControlName="ingredients" rows="6"></textarea>
+  </app-form-field>
+
+  <app-form-field
+    label="Preparación"
+    inputId="rc-instructions"
+    [error]="error('instructions')"
+    hint="Un paso por línea."
+  >
+    <textarea id="rc-instructions" formControlName="instructions" rows="8"></textarea>
+  </app-form-field>
+
+  <label class="checkbox">
+    <input type="checkbox" formControlName="active" />
+    <span>Publicada (visible para los alumnos con recetario habilitado)</span>
+  </label>
+
+  <div class="form__actions">
+    <button app-button variant="ghost" type="button" (click)="cancelled.emit()">Cancelar</button>
+    <button app-button type="submit" [loading]="submitting()" [disabled]="uploading()">
+      Guardar receta
+    </button>
+  </div>
+</form>

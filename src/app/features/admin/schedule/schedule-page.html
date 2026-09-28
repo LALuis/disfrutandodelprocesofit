@@ -1,0 +1,150 @@
+<app-page-header
+  eyebrow="Administración"
+  title="Horarios"
+  subtitle="Definí los turnos disponibles, su cupo y si están habilitados."
+>
+  <button
+    actions
+    app-button
+    [variant]="generatorOpen() ? 'secondary' : 'primary'"
+    type="button"
+    (click)="generatorOpen.set(!generatorOpen())"
+  >
+    <app-icon [name]="generatorOpen() ? 'close' : 'plus'" [size]="18" />
+    {{ generatorOpen() ? 'Cerrar generador' : 'Generar horarios' }}
+  </button>
+</app-page-header>
+
+@if (generatorOpen()) {
+  <app-card class="mb-6">
+    <h2 class="schedule__form-title">Generar horarios en bloque</h2>
+    <p class="text-muted mb-4">
+      Crea un turno por cada día y horario seleccionado. Los turnos que ya existen conservan sus
+      reservas.
+    </p>
+    <app-slot-generator-form [submitting]="generating()" (generate)="generate($event)" />
+  </app-card>
+}
+
+<app-date-nav [(date)]="date" />
+
+@if (slots.isLoading()) {
+  <app-loading-state message="Cargando horarios…" />
+} @else if (slots.error()) {
+  <app-error-state title="No pudimos cargar los horarios" (retry)="slots.reload()" />
+} @else {
+  @if (slots.hasValue() && slots.value().length) {
+    <ul class="slots">
+      @for (slot of slots.value(); track slot.id) {
+        <li class="slot" [class.slot--disabled]="!slot.enabled" [class.slot--past]="isPast(slot)">
+          <div class="slot__time">
+            <strong>{{ slot.startTime }}</strong>
+            <span class="text-muted">{{ slot.durationMinutes }} min</span>
+          </div>
+          <div class="slot__capacity">
+            <label class="slot__field">
+              <span>Cupo</span>
+              <input
+                type="number"
+                min="1"
+                max="200"
+                inputmode="numeric"
+                [value]="slot.capacity"
+                [disabled]="busySlotId() === slot.id"
+                (change)="changeCapacity(slot, $event)"
+                [attr.aria-label]="'Cupo del turno de las ' + slot.startTime"
+              />
+            </label>
+            <span class="slot__booked">
+              {{ slot.bookedCount }} reservados · {{ remaining(slot) }} libres
+            </span>
+          </div>
+          <div class="slot__status">
+            @if (isPast(slot)) {
+              <app-badge tone="neutral">Pasado</app-badge>
+            } @else if (!slot.enabled) {
+              <app-badge tone="warning">Deshabilitado</app-badge>
+            } @else if (remaining(slot) === 0) {
+              <app-badge tone="error">Completo</app-badge>
+            } @else {
+              <app-badge tone="success">Disponible</app-badge>
+            }
+          </div>
+          <div class="slot__actions">
+            <button
+              app-button
+              variant="ghost"
+              size="sm"
+              type="button"
+              [loading]="busySlotId() === slot.id"
+              (click)="toggleEnabled(slot)"
+            >
+              {{ slot.enabled ? 'Deshabilitar' : 'Habilitar' }}
+            </button>
+            <button
+              app-button
+              variant="ghost"
+              size="sm"
+              type="button"
+              [disabled]="slot.bookedCount > 0 || busySlotId() === slot.id"
+              (click)="remove(slot)"
+              [attr.aria-label]="'Eliminar turno de las ' + slot.startTime"
+              [title]="
+                slot.bookedCount > 0 ? 'No se puede eliminar un turno con reservas' : 'Eliminar'
+              "
+            >
+              <app-icon name="trash" [size]="16" />
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  } @else {
+    <app-empty-state
+      icon="calendar"
+      title="Sin horarios para este día"
+      description="Agregá un turno suelto o usá el generador para cargar varias semanas."
+    />
+  }
+
+  <app-card class="mt-4">
+    <h2 class="schedule__form-title">Agregar un turno en este día</h2>
+    <form class="form" [formGroup]="addForm" (ngSubmit)="addSlot()" novalidate>
+      <div class="form__grid form__grid--3">
+        <app-form-field label="Hora de inicio" inputId="add-time" [error]="addError('startTime')">
+          <input id="add-time" type="time" formControlName="startTime" />
+        </app-form-field>
+        <app-form-field label="Cupo" inputId="add-capacity" [error]="addError('capacity')">
+          <input
+            id="add-capacity"
+            type="number"
+            min="1"
+            max="200"
+            inputmode="numeric"
+            formControlName="capacity"
+          />
+        </app-form-field>
+        <app-form-field
+          label="Duración (min)"
+          inputId="add-duration"
+          [error]="addError('durationMinutes')"
+        >
+          <input
+            id="add-duration"
+            type="number"
+            min="15"
+            max="240"
+            step="15"
+            inputmode="numeric"
+            formControlName="durationMinutes"
+          />
+        </app-form-field>
+      </div>
+      <div class="form__actions">
+        <button app-button variant="secondary" type="submit" [loading]="adding()">
+          Agregar turno
+        </button>
+      </div>
+    </form>
+  </app-card>
+}

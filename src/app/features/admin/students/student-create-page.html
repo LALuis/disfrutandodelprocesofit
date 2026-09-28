@@ -1,0 +1,56 @@
+<a class="back-link" routerLink="/admin/alumnos">
+  <app-icon name="arrow-left" [size]="16" />
+  Volver a alumnos
+</a>
+
+@if (created(); as result) {
+  <app-page-header eyebrow="Alumnos" title="Alumno creado" />
+  <app-card class="created">
+    <div class="created__icon"><app-icon name="circle-check" [size]="28" /></div>
+    <h2 class="created__title">{{ result.name }}</h2>
+    <p class="text-muted">
+      La cuenta <strong>{{ result.email }}</strong> ya está activa. La contraseña inicial es
+      aleatoria y no se muestra: el alumno la define con el siguiente enlace (válido una sola vez) o
+      usando “Olvidé mi contraseña” en la pantalla de ingreso.
+    </p>
+    <label class="created__link-label" for="setup-link">Enlace para definir contraseña</label>
+    <div class="created__link">
+      <input
+        id="setup-link"
+        type="text"
+        readonly
+        [value]="result.passwordSetupLink"
+        (focus)="$any($event.target).select()"
+      />
+      <button app-button variant="secondary" type="button" (click)="copyLink()">
+        <app-icon [name]="copied() ? 'check' : 'copy'" [size]="16" />
+        {{ copied() ? 'Copiado' : 'Copiar' }}
+      </button>
+    </div>
+    <div class="created__actions">
+      <a app-button [routerLink]="['/admin/alumnos', result.uid]">Ver ficha del alumno</a>
+      <a app-button variant="ghost" routerLink="/admin/alumnos/nuevo" (click)="created.set(null)">
+        Crear otro alumno
+      </a>
+    </div>
+  </app-card>
+} @else {
+  <app-page-header
+    eyebrow="Alumnos"
+    title="Nuevo alumno"
+    subtitle="La cuenta se crea desde el servidor con rol de alumno. No se envía ninguna contraseña por email."
+  />
+  <app-card>
+    @if (errorMessage()) {
+      <p class="form__error" role="alert">
+        <app-icon name="alert-triangle" [size]="16" />
+        {{ errorMessage() }}
+      </p>
+    }
+    <app-student-form
+      submitLabel="Crear alumno"
+      [submitting]="submitting()"
+      (save)="create($event)"
+    />
+  </app-card>
+}

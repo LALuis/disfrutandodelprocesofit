@@ -1,10 +1,30 @@
 rules_version = '2';
 
-// Milestone 1 baseline: nothing is readable or writable from clients yet.
-// Recipe images (public read, admin write) and private student files are added with their
-// milestones, each with its own explicit match block.
 service firebase.storage {
   match /b/{bucket}/o {
+    function isAdmin() {
+      return request.auth != null && request.auth.token.role == 'ADMIN';
+    }
+
+    function isImageUpload() {
+      return request.resource.contentType.matches('image/.*')
+        && request.resource.size < 5 * 1024 * 1024;
+    }
+
+    // Recipe images are public marketing-style content; only admins upload them.
+    match /recipes/{fileName} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isImageUpload();
+      allow delete: if isAdmin();
+    }
+
+    // Private student files (progress photos, future). Only the student and admins.
+    match /users/{userId}/{allPaths=**} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId);
+      allow write: if isAdmin() && isImageUpload();
+    }
+
+    // Everything else is denied.
     match /{allPaths=**} {
       allow read, write: if false;
     }

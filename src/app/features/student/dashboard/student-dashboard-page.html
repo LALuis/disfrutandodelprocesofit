@@ -1,0 +1,82 @@
+<app-page-header eyebrow="Inicio" [title]="greeting()" subtitle="Tu resumen de hoy." />
+
+<div class="cards">
+  <app-card class="card--next">
+    <div class="card__head">
+      <span class="card__label">Próxima reserva</span>
+      <app-icon name="calendar" [size]="18" />
+    </div>
+    @if (nextBooking(); as booking) {
+      <p class="card__value">{{ booking.startTime }} hs</p>
+      <p class="card__hint">{{ formatDate(booking.date) }}</p>
+    } @else {
+      <p class="card__value card__value--muted">Sin reservas</p>
+      <p class="card__hint">Reservá tu próximo turno.</p>
+    }
+    <a app-button variant="secondary" size="sm" routerLink="/app/agenda">Ir a la agenda</a>
+  </app-card>
+
+  <app-card>
+    <div class="card__head">
+      <span class="card__label">Plan de entrenamiento</span>
+      <app-icon name="dumbbell" [size]="18" />
+    </div>
+    @if (trainingPlan.hasValue() && trainingPlan.value(); as plan) {
+      <p class="card__value">{{ plan.name }}</p>
+      <p class="card__hint">{{ plan.days.length }} días de entrenamiento</p>
+    } @else {
+      <p class="card__value card__value--muted">Sin plan activo</p>
+      <p class="card__hint">Tu coach lo va a cargar pronto.</p>
+    }
+    <a app-button variant="secondary" size="sm" routerLink="/app/entrenamiento">Ver mi ficha</a>
+  </app-card>
+
+  <app-stat-card
+    label="Peso actual"
+    [value]="weight().current ?? '–'"
+    [unit]="weight().current !== null ? 'kg' : ''"
+    icon="scale"
+    [hint]="changeLabel(weight().change)"
+    [tone]="weight().change === null ? 'default' : weight().change! < 0 ? 'success' : 'accent'"
+  />
+
+  <app-stat-card
+    label="Mediciones"
+    [value]="measurementCount()"
+    icon="ruler"
+    [hint]="
+      lastMeasurementDate()
+        ? 'Última: ' + formatDate(lastMeasurementDate())
+        : 'Todavía sin registros'
+    "
+  >
+    <a app-button variant="ghost" size="sm" routerLink="/app/progreso">Ver progreso</a>
+  </app-stat-card>
+
+  <app-card>
+    <div class="card__head">
+      <span class="card__label">Nutrición</span>
+      <app-icon name="salad" [size]="18" />
+    </div>
+    @if (profile()?.features?.nutritionEnabled) {
+      <app-badge tone="success">Habilitada</app-badge>
+      <p class="card__hint">Tu plan de alimentación está disponible.</p>
+      <a app-button variant="secondary" size="sm" routerLink="/app/nutricion">Ver plan</a>
+    } @else {
+      <app-badge tone="neutral">No incluida</app-badge>
+      <p class="card__hint">Consultá en el gimnasio para sumar el seguimiento nutricional.</p>
+    }
+  </app-card>
+</div>
+
+<section class="upcoming">
+  <h2 class="upcoming__title">Próximas sesiones</h2>
+  @if (upcoming().length) {
+    <app-booking-list [bookings]="upcoming()" />
+  } @else {
+    <p class="text-muted">
+      No tenés sesiones reservadas.
+      <a class="text-accent" routerLink="/app/agenda">Reservar ahora</a>.
+    </p>
+  }
+</section>

@@ -16,7 +16,8 @@
     "firebase:emulators": "firebase emulators:start --only auth,firestore,functions,storage",
     "firebase:emulators:persist": "firebase emulators:start --only auth,firestore,functions,storage --import=./.emulator-data --export-on-exit",
     "seed": "tsx scripts/seed/seed.ts",
-    "postinstall": "npm --prefix functions install"
+    "postinstall": "npm --prefix functions install",
+    "test:emulator": "npm run functions:build && firebase emulators:exec --only auth,firestore,functions,storage \"vitest run --config tests/vitest.config.mts\""
   },
   "private": true,
   "packageManager": "npm@11.19.0",
@@ -37,6 +38,7 @@
     "@angular/cli": "^22.1.8",
     "@angular/compiler-cli": "^22.1.0",
     "@eslint/js": "^10.0.1",
+    "@firebase/rules-unit-testing": "^5.0.2",
     "angular-eslint": "22.5.0",
     "concurrently": "^10.0.5",
     "eslint": "^10.9.1",

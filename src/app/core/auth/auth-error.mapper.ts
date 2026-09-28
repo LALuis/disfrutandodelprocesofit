@@ -8,6 +8,8 @@ const MESSAGES: Record<string, string> = {
   'auth/user-disabled': 'Tu cuenta está deshabilitada. Comunicate con el gimnasio.',
   'auth/too-many-requests': 'Demasiados intentos. Esperá unos minutos y volvé a probar.',
   'auth/network-request-failed': 'No pudimos conectarnos. Revisá tu conexión a internet.',
+  'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
+  'auth/requires-recent-login': 'Por seguridad, volvé a ingresar antes de cambiar la contraseña.',
 };
 
 const DEFAULT_MESSAGE = 'Ocurrió un error inesperado. Intentá de nuevo en unos minutos.';

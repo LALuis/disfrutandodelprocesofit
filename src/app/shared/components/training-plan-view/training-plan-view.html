@@ -1,0 +1,67 @@
+@if (showHeader()) {
+  <header class="plan__header">
+    <div>
+      <h2 class="plan__name">{{ plan().name }}</h2>
+      @if (plan().description) {
+        <p class="text-muted">{{ plan().description }}</p>
+      }
+    </div>
+    <div class="plan__meta">
+      <app-badge [tone]="plan().active ? 'success' : 'neutral'">{{
+        plan().active ? 'Activo' : 'Finalizado'
+      }}</app-badge>
+      <span class="text-muted">
+        {{ formatDate(plan().startDate) }}
+        @if (plan().endDate) {
+          – {{ formatDate(plan().endDate) }}
+        }
+      </span>
+    </div>
+  </header>
+}
+
+<div class="plan__days">
+  @for (day of plan().days; track day.id) {
+    <details class="day" [open]="$first">
+      <summary class="day__summary">
+        <span class="day__name">{{ day.name }}</span>
+        @if (day.focus) {
+          <span class="day__focus">{{ day.focus }}</span>
+        }
+        <span class="day__count">{{ day.exercises.length }} ejercicios</span>
+      </summary>
+      @if (day.exercises.length) {
+        <div class="table-wrap">
+          <table class="table exercises">
+            <thead>
+              <tr>
+                <th scope="col">Ejercicio</th>
+                <th scope="col">Series</th>
+                <th scope="col">Reps</th>
+                <th scope="col">Descanso</th>
+                <th scope="col">Peso</th>
+                <th scope="col">Notas</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (exercise of day.exercises; track $index) {
+                <tr>
+                  <td class="exercises__name">{{ exercise.name }}</td>
+                  <td>{{ exercise.sets }}</td>
+                  <td>{{ exercise.reps }}</td>
+                  <td>{{ exercise.rest || '–' }}</td>
+                  <td>{{ exercise.targetWeight || '–' }}</td>
+                  <td class="exercises__notes">{{ exercise.notes || '–' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="text-muted day__empty">Sin ejercicios cargados.</p>
+      }
+    </details>
+  } @empty {
+    <p class="text-muted">Este plan todavía no tiene días de entrenamiento.</p>
+  }
+</div>

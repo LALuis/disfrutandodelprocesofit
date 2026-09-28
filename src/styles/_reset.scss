@@ -79,3 +79,12 @@ p {
     scroll-behavior: auto !important;
   }
 }
+
+// Routed components are custom elements (inline by default). Making them block containers
+// with min-width: 0 keeps wide content (tables, forms) scrolling inside its own wrapper
+// instead of the page.
+main > *,
+router-outlet + * {
+  display: block;
+  min-width: 0;
+}

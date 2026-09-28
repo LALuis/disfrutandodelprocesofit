@@ -1,0 +1,56 @@
+<app-page-header
+  eyebrow="Administración"
+  title="Dashboard"
+  subtitle="Resumen de la actividad del gimnasio."
+>
+  <a actions app-button variant="secondary" size="sm" routerLink="/admin/alumnos/nuevo">
+    <app-icon name="plus" [size]="16" />
+    Nuevo alumno
+  </a>
+</app-page-header>
+
+@if (stats.isLoading()) {
+  <app-loading-state message="Calculando métricas…" />
+} @else if (stats.error()) {
+  <app-error-state title="No pudimos cargar las métricas" (retry)="stats.reload()" />
+} @else if (stats.hasValue() && stats.value(); as s) {
+  <div class="stats">
+    <app-stat-card label="Alumnos activos" [value]="s.activeStudents" icon="users" tone="accent" />
+    <app-stat-card label="Reservas de hoy" [value]="s.todayBookings" icon="calendar" />
+    <app-stat-card label="Reservas próximos 7 días" [value]="s.upcomingBookings" icon="clock" />
+    <app-stat-card
+      label="Turnos con lugar"
+      [value]="s.availableSlots"
+      icon="circle-check"
+      tone="success"
+      hint="Próximos 7 días"
+    />
+    <app-stat-card
+      label="Turnos completos"
+      [value]="s.fullSlots"
+      icon="ban"
+      [tone]="s.fullSlots > 0 ? 'warning' : 'default'"
+      hint="Próximos 7 días"
+    />
+    <app-stat-card label="Con nutrición" [value]="s.nutritionEnabled" icon="salad" />
+    <app-stat-card label="Con recetario" [value]="s.recipesEnabled" icon="chef-hat" />
+  </div>
+
+  <section class="quick">
+    <h2 class="quick__title">Accesos rápidos</h2>
+    <div class="quick__links">
+      <a class="quick__link" routerLink="/admin/reservas"
+        ><app-icon name="calendar" [size]="20" /><span>Reservas de hoy</span></a
+      >
+      <a class="quick__link" routerLink="/admin/horarios"
+        ><app-icon name="clock" [size]="20" /><span>Gestionar horarios</span></a
+      >
+      <a class="quick__link" routerLink="/admin/alumnos"
+        ><app-icon name="users" [size]="20" /><span>Alumnos</span></a
+      >
+      <a class="quick__link" routerLink="/admin/recetas"
+        ><app-icon name="chef-hat" [size]="20" /><span>Recetario</span></a
+      >
+    </div>
+  </section>
+}

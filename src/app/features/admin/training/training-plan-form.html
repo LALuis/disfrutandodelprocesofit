@@ -1,0 +1,176 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="form__grid">
+    <app-form-field label="Nombre del plan" inputId="tp-name" [error]="error('name')">
+      <input id="tp-name" type="text" formControlName="name" placeholder="Ej. Fuerza · Bloque 1" />
+    </app-form-field>
+    <app-form-field label="Descripción" inputId="tp-description" [error]="error('description')">
+      <input
+        id="tp-description"
+        type="text"
+        formControlName="description"
+        placeholder="Objetivo del bloque"
+      />
+    </app-form-field>
+    <app-form-field label="Inicio" inputId="tp-start" [error]="error('startDate')">
+      <input id="tp-start" type="date" formControlName="startDate" />
+    </app-form-field>
+    <app-form-field label="Fin (opcional)" inputId="tp-end" [error]="error('endDate')">
+      <input id="tp-end" type="date" formControlName="endDate" />
+    </app-form-field>
+  </div>
+
+  <label class="checkbox">
+    <input type="checkbox" formControlName="active" />
+    <span>Plan activo (el alumno lo ve como su ficha actual; desactiva los demás)</span>
+  </label>
+
+  <div class="days" formArrayName="days">
+    @for (day of days.controls; track day.controls.id.value; let dayIndex = $index) {
+      <section class="form__section" [formGroupName]="dayIndex">
+        <div class="form__section-head">
+          <h3>Día {{ dayIndex + 1 }}</h3>
+          <button
+            app-button
+            variant="ghost"
+            size="sm"
+            type="button"
+            (click)="removeDay(dayIndex)"
+            [disabled]="days.length === 1"
+          >
+            <app-icon name="trash" [size]="16" />
+            Quitar día
+          </button>
+        </div>
+        <div class="form__grid">
+          <app-form-field
+            label="Nombre"
+            [inputId]="'day-name-' + dayIndex"
+            [error]="fieldError(day, 'name')"
+          >
+            <input [id]="'day-name-' + dayIndex" type="text" formControlName="name" />
+          </app-form-field>
+          <app-form-field
+            label="Grupo muscular / enfoque"
+            [inputId]="'day-focus-' + dayIndex"
+            [error]="fieldError(day, 'focus')"
+          >
+            <input
+              [id]="'day-focus-' + dayIndex"
+              type="text"
+              formControlName="focus"
+              placeholder="Ej. Pecho / Tríceps"
+            />
+          </app-form-field>
+        </div>
+
+        <div class="exercises" formArrayName="exercises">
+          @for (exercise of exercisesOf(day).controls; track exercise; let exIndex = $index) {
+            <div class="exercise" [formGroupName]="exIndex">
+              <app-form-field
+                class="exercise__name"
+                label="Ejercicio"
+                [inputId]="'ex-name-' + dayIndex + '-' + exIndex"
+                [error]="fieldError(exercise, 'name')"
+              >
+                <input
+                  [id]="'ex-name-' + dayIndex + '-' + exIndex"
+                  type="text"
+                  formControlName="name"
+                />
+              </app-form-field>
+              <app-form-field
+                label="Series"
+                [inputId]="'ex-sets-' + dayIndex + '-' + exIndex"
+                [error]="fieldError(exercise, 'sets')"
+              >
+                <input
+                  [id]="'ex-sets-' + dayIndex + '-' + exIndex"
+                  type="number"
+                  min="1"
+                  max="50"
+                  inputmode="numeric"
+                  formControlName="sets"
+                />
+              </app-form-field>
+              <app-form-field
+                label="Reps"
+                [inputId]="'ex-reps-' + dayIndex + '-' + exIndex"
+                [error]="fieldError(exercise, 'reps')"
+              >
+                <input
+                  [id]="'ex-reps-' + dayIndex + '-' + exIndex"
+                  type="text"
+                  formControlName="reps"
+                  placeholder="8-12"
+                />
+              </app-form-field>
+              <app-form-field
+                label="Descanso"
+                [inputId]="'ex-rest-' + dayIndex + '-' + exIndex"
+                [error]="fieldError(exercise, 'rest')"
+              >
+                <input
+                  [id]="'ex-rest-' + dayIndex + '-' + exIndex"
+                  type="text"
+                  formControlName="rest"
+                  placeholder="90 s"
+                />
+              </app-form-field>
+              <app-form-field
+                label="Peso objetivo"
+                [inputId]="'ex-weight-' + dayIndex + '-' + exIndex"
+                [error]="fieldError(exercise, 'targetWeight')"
+              >
+                <input
+                  [id]="'ex-weight-' + dayIndex + '-' + exIndex"
+                  type="text"
+                  formControlName="targetWeight"
+                  placeholder="40 kg"
+                />
+              </app-form-field>
+              <app-form-field
+                class="exercise__notes"
+                label="Notas"
+                [inputId]="'ex-notes-' + dayIndex + '-' + exIndex"
+                [error]="fieldError(exercise, 'notes')"
+              >
+                <input
+                  [id]="'ex-notes-' + dayIndex + '-' + exIndex"
+                  type="text"
+                  formControlName="notes"
+                />
+              </app-form-field>
+              <button
+                class="exercise__remove"
+                app-button
+                variant="ghost"
+                size="sm"
+                type="button"
+                (click)="removeExercise(day, exIndex)"
+                aria-label="Quitar ejercicio"
+              >
+                <app-icon name="close" [size]="16" />
+              </button>
+            </div>
+          }
+          <button app-button variant="secondary" size="sm" type="button" (click)="addExercise(day)">
+            <app-icon name="plus" [size]="16" />
+            Agregar ejercicio
+          </button>
+        </div>
+      </section>
+    }
+  </div>
+
+  <div>
+    <button app-button variant="secondary" type="button" (click)="addDay()">
+      <app-icon name="plus" [size]="16" />
+      Agregar día
+    </button>
+  </div>
+
+  <div class="form__actions">
+    <button app-button variant="ghost" type="button" (click)="cancelled.emit()">Cancelar</button>
+    <button app-button type="submit" [loading]="submitting()">Guardar plan</button>
+  </div>
+</form>

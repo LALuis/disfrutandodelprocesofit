@@ -1,0 +1,95 @@
+@if (profile.hasValue() && profile.value() && !profile.value()!.features.nutritionEnabled) {
+  <p class="form__error mb-4" role="status">
+    <app-icon name="alert-triangle" [size]="16" />
+    Este alumno no tiene habilitada la nutrición: no va a ver estos planes hasta que la actives en
+    su perfil.
+  </p>
+}
+
+@if (editing() !== undefined) {
+  <app-card class="mb-6">
+    <h2 class="plans__form-title">{{ editing() ? 'Editar plan' : 'Nuevo plan de nutrición' }}</h2>
+    @if (errorMessage()) {
+      <p class="form__error" role="alert">
+        <app-icon name="alert-triangle" [size]="16" />
+        {{ errorMessage() }}
+      </p>
+    }
+    <app-nutrition-plan-form
+      [plan]="editing() ?? null"
+      [submitting]="submitting()"
+      (save)="save($event)"
+      (cancelled)="closeForm()"
+    />
+  </app-card>
+} @else {
+  <div class="page-actions mb-4">
+    <button app-button type="button" (click)="openCreate()">
+      <app-icon name="plus" [size]="18" />
+      Nuevo plan
+    </button>
+  </div>
+}
+
+@if (plans.isLoading()) {
+  <app-loading-state message="Cargando planes…" />
+} @else if (plans.error()) {
+  <app-error-state title="No pudimos cargar los planes" (retry)="plans.reload()" />
+} @else if (plans.hasValue() && plans.value().length) {
+  <div class="plans">
+    @for (plan of plans.value(); track plan.id) {
+      <app-card>
+        <div class="plans__head">
+          <div class="plans__title">
+            <h3>{{ plan.title }}</h3>
+            <app-badge [tone]="plan.active ? 'success' : 'neutral'">{{
+              plan.active ? 'Activo' : 'Inactivo'
+            }}</app-badge>
+          </div>
+          <p class="text-muted plans__dates">
+            {{ formatDate(plan.startDate) }}
+            @if (plan.endDate) {
+              – {{ formatDate(plan.endDate) }}
+            }
+            · {{ plan.meals.length }} comidas
+          </p>
+          <div class="page-actions">
+            <button app-button variant="secondary" size="sm" type="button" (click)="openEdit(plan)">
+              <app-icon name="pencil" [size]="14" />
+              Editar
+            </button>
+            <button
+              app-button
+              variant="ghost"
+              size="sm"
+              type="button"
+              (click)="setActive(plan, !plan.active)"
+            >
+              {{ plan.active ? 'Desactivar' : 'Activar' }}
+            </button>
+            <button
+              app-button
+              variant="ghost"
+              size="sm"
+              type="button"
+              (click)="remove(plan)"
+              aria-label="Eliminar plan"
+            >
+              <app-icon name="trash" [size]="14" />
+            </button>
+          </div>
+        </div>
+        <details>
+          <summary class="plans__toggle">Ver detalle</summary>
+          <app-nutrition-plan-view class="mt-4" [plan]="plan" [showHeader]="false" />
+        </details>
+      </app-card>
+    }
+  </div>
+} @else {
+  <app-empty-state
+    icon="salad"
+    title="Sin planes de nutrición"
+    description="Creá el primer plan para este alumno."
+  />
+}

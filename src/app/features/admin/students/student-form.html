@@ -1,0 +1,75 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="form__grid">
+    <app-form-field label="Nombre" inputId="student-firstName" [error]="error('firstName')">
+      <input id="student-firstName" type="text" formControlName="firstName" autocomplete="off" />
+    </app-form-field>
+
+    <app-form-field label="Apellido" inputId="student-lastName" [error]="error('lastName')">
+      <input id="student-lastName" type="text" formControlName="lastName" autocomplete="off" />
+    </app-form-field>
+
+    <app-form-field
+      label="Email"
+      inputId="student-email"
+      [error]="error('email')"
+      [hint]="
+        isEdit()
+          ? 'El email no se puede modificar.'
+          : 'Con este email el alumno va a ingresar al portal.'
+      "
+    >
+      <input
+        id="student-email"
+        type="email"
+        formControlName="email"
+        autocomplete="off"
+        inputmode="email"
+      />
+    </app-form-field>
+
+    <app-form-field label="Teléfono" inputId="student-phone" [error]="error('phone')">
+      <input
+        id="student-phone"
+        type="tel"
+        formControlName="phone"
+        autocomplete="off"
+        inputmode="tel"
+      />
+    </app-form-field>
+
+    <app-form-field
+      label="Fecha de nacimiento"
+      inputId="student-birthDate"
+      [error]="error('birthDate')"
+    >
+      <input id="student-birthDate" type="date" formControlName="birthDate" />
+    </app-form-field>
+
+    <app-form-field label="Fecha de ingreso" inputId="student-joinDate" [error]="error('joinDate')">
+      <input id="student-joinDate" type="date" formControlName="joinDate" />
+    </app-form-field>
+  </div>
+
+  <app-form-field
+    label="Notas internas"
+    inputId="student-notes"
+    [error]="error('notes')"
+    hint="Solo visibles para administradores."
+  >
+    <textarea id="student-notes" formControlName="notes" rows="3"></textarea>
+  </app-form-field>
+
+  <fieldset class="form__features" formGroupName="features">
+    <legend>Funcionalidades habilitadas</legend>
+    @for (key of featureKeys; track key) {
+      <label class="checkbox">
+        <input type="checkbox" [formControlName]="key" />
+        <span>{{ featureLabels[key] }}</span>
+      </label>
+    }
+  </fieldset>
+
+  <div class="form__actions">
+    <button app-button type="submit" [loading]="submitting()">{{ submitLabel() }}</button>
+  </div>
+</form>

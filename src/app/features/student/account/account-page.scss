@@ -1,0 +1,14 @@
+.account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.account__name {
+  font-size: var(--text-xl);
+}
+
+.account__section {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-4);
+}

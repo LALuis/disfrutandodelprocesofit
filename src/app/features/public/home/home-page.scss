@@ -15,11 +15,28 @@
   }
 }
 
+.hero__grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-10);
+}
+
 .hero__inner {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
   max-width: 760px;
+}
+
+// The full logo repeats the gym name, so it only appears where it reads as artwork.
+.hero__logo {
+  display: none;
+
+  @include bp.up('lg') {
+    display: block;
+    width: clamp(260px, 28vw, 380px);
+  }
 }
 
 .hero__title {

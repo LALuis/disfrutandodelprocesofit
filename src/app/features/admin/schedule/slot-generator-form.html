@@ -1,0 +1,61 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="form__grid">
+    <app-form-field label="Desde" inputId="gen-from" [error]="error('fromDate')">
+      <input id="gen-from" type="date" formControlName="fromDate" />
+    </app-form-field>
+    <app-form-field label="Hasta" inputId="gen-to" [error]="error('toDate')">
+      <input id="gen-to" type="date" formControlName="toDate" />
+    </app-form-field>
+  </div>
+
+  <fieldset formGroupName="weekdays">
+    <legend>Días de la semana</legend>
+    @for (day of weekdays; track day.value) {
+      <label class="checkbox">
+        <input type="checkbox" [formControlName]="day.key" />
+        <span>{{ day.label }}</span>
+      </label>
+    }
+  </fieldset>
+
+  <app-form-field
+    label="Horarios de inicio"
+    inputId="gen-times"
+    [error]="error('times')"
+    hint="Separados por coma, formato 24 h."
+  >
+    <input id="gen-times" type="text" formControlName="times" />
+  </app-form-field>
+
+  <div class="form__grid">
+    <app-form-field label="Cupo por turno" inputId="gen-capacity" [error]="error('capacity')">
+      <input
+        id="gen-capacity"
+        type="number"
+        min="1"
+        max="200"
+        inputmode="numeric"
+        formControlName="capacity"
+      />
+    </app-form-field>
+    <app-form-field
+      label="Duración (minutos)"
+      inputId="gen-duration"
+      [error]="error('durationMinutes')"
+    >
+      <input
+        id="gen-duration"
+        type="number"
+        min="15"
+        max="240"
+        step="15"
+        inputmode="numeric"
+        formControlName="durationMinutes"
+      />
+    </app-form-field>
+  </div>
+
+  <div class="form__actions">
+    <button app-button type="submit" [loading]="submitting()">Generar horarios</button>
+  </div>
+</form>

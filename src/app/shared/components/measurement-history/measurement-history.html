@@ -1,0 +1,76 @@
+<div class="table-wrap history--table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Fecha</th>
+        @for (metric of metrics; track metric) {
+          <th scope="col">{{ meta[metric].label }} ({{ meta[metric].unit }})</th>
+        }
+        <th scope="col">Notas</th>
+        @if (canDelete()) {
+          <th scope="col"><span class="visually-hidden">Acciones</span></th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (m of measurements(); track m.id) {
+        <tr>
+          <td>{{ formatDate(m.date) }}</td>
+          @for (metric of metrics; track metric) {
+            <td>{{ m[metric] ?? '–' }}</td>
+          }
+          <td class="history__notes">{{ m.notes || '–' }}</td>
+          @if (canDelete()) {
+            <td class="table__actions">
+              <button
+                app-button
+                variant="ghost"
+                size="sm"
+                type="button"
+                (click)="remove.emit(m)"
+                [attr.aria-label]="'Eliminar medición del ' + formatDate(m.date)"
+              >
+                <app-icon name="trash" [size]="16" />
+              </button>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<ul class="list-cards history--cards">
+  @for (m of measurements(); track m.id) {
+    <li class="history-card">
+      <div class="history-card__head">
+        <strong>{{ formatDate(m.date) }}</strong>
+        @if (canDelete()) {
+          <button
+            app-button
+            variant="ghost"
+            size="sm"
+            type="button"
+            (click)="remove.emit(m)"
+            [attr.aria-label]="'Eliminar medición del ' + formatDate(m.date)"
+          >
+            <app-icon name="trash" [size]="16" />
+          </button>
+        }
+      </div>
+      <dl class="history-card__metrics">
+        @for (metric of metrics; track metric) {
+          @if (m[metric] !== null) {
+            <div>
+              <dt>{{ meta[metric].label }}</dt>
+              <dd>{{ m[metric] }} {{ meta[metric].unit }}</dd>
+            </div>
+          }
+        }
+      </dl>
+      @if (m.notes) {
+        <p class="history-card__notes text-muted">{{ m.notes }}</p>
+      }
+    </li>
+  }
+</ul>

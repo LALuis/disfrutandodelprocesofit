@@ -1,0 +1,162 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="form__grid">
+    <app-form-field label="Título" inputId="np-title" [error]="error('title')">
+      <input
+        id="np-title"
+        type="text"
+        formControlName="title"
+        placeholder="Ej. Plan de definición"
+      />
+    </app-form-field>
+    <app-form-field label="Objetivo" inputId="np-objective" [error]="error('objective')">
+      <input
+        id="np-objective"
+        type="text"
+        formControlName="objective"
+        placeholder="Ej. Bajar 3 kg manteniendo masa muscular"
+      />
+    </app-form-field>
+    <app-form-field label="Inicio" inputId="np-start" [error]="error('startDate')">
+      <input id="np-start" type="date" formControlName="startDate" />
+    </app-form-field>
+    <app-form-field label="Fin (opcional)" inputId="np-end" [error]="error('endDate')">
+      <input id="np-end" type="date" formControlName="endDate" />
+    </app-form-field>
+  </div>
+  <app-form-field label="Descripción" inputId="np-description" [error]="error('description')">
+    <textarea id="np-description" formControlName="description" rows="2"></textarea>
+  </app-form-field>
+
+  <label class="checkbox">
+    <input type="checkbox" formControlName="active" />
+    <span>Plan activo (el alumno lo ve como su plan actual; desactiva los demás)</span>
+  </label>
+
+  <div class="meals" formArrayName="meals">
+    @for (meal of meals.controls; track meal.controls.id.value; let mealIndex = $index) {
+      <section class="form__section" [formGroupName]="mealIndex">
+        <div class="form__section-head">
+          <h3>{{ mealLabels[meal.controls.type.value] }}</h3>
+          <button
+            app-button
+            variant="ghost"
+            size="sm"
+            type="button"
+            (click)="removeMeal(mealIndex)"
+          >
+            <app-icon name="trash" [size]="16" />
+            Quitar comida
+          </button>
+        </div>
+        <div class="form__grid form__grid--3">
+          <app-form-field label="Tipo" [inputId]="'meal-type-' + mealIndex">
+            <select [id]="'meal-type-' + mealIndex" formControlName="type">
+              @for (type of mealTypes; track type) {
+                <option [value]="type">{{ mealLabels[type] }}</option>
+              }
+            </select>
+          </app-form-field>
+          <app-form-field
+            label="Nombre (opcional)"
+            [inputId]="'meal-name-' + mealIndex"
+            [error]="fieldError(meal, 'name')"
+          >
+            <input
+              [id]="'meal-name-' + mealIndex"
+              type="text"
+              formControlName="name"
+              placeholder="Ej. Avena con frutas"
+            />
+          </app-form-field>
+          <app-form-field
+            label="Descripción"
+            [inputId]="'meal-desc-' + mealIndex"
+            [error]="fieldError(meal, 'description')"
+          >
+            <input [id]="'meal-desc-' + mealIndex" type="text" formControlName="description" />
+          </app-form-field>
+        </div>
+
+        <div class="foods" formArrayName="foods">
+          @for (food of foodsOf(meal).controls; track food; let foodIndex = $index) {
+            <div class="food" [formGroupName]="foodIndex">
+              <app-form-field
+                label="Alimento"
+                [inputId]="'food-name-' + mealIndex + '-' + foodIndex"
+                [error]="fieldError(food, 'name')"
+              >
+                <input
+                  [id]="'food-name-' + mealIndex + '-' + foodIndex"
+                  type="text"
+                  formControlName="name"
+                />
+              </app-form-field>
+              <app-form-field
+                label="Cantidad"
+                [inputId]="'food-qty-' + mealIndex + '-' + foodIndex"
+                [error]="fieldError(food, 'quantity')"
+              >
+                <input
+                  [id]="'food-qty-' + mealIndex + '-' + foodIndex"
+                  type="text"
+                  formControlName="quantity"
+                  placeholder="Ej. 100 g"
+                />
+              </app-form-field>
+              <app-form-field
+                label="Notas"
+                [inputId]="'food-notes-' + mealIndex + '-' + foodIndex"
+                [error]="fieldError(food, 'notes')"
+              >
+                <input
+                  [id]="'food-notes-' + mealIndex + '-' + foodIndex"
+                  type="text"
+                  formControlName="notes"
+                />
+              </app-form-field>
+              <button
+                class="food__remove"
+                app-button
+                variant="ghost"
+                size="sm"
+                type="button"
+                (click)="removeFood(meal, foodIndex)"
+                aria-label="Quitar alimento"
+              >
+                <app-icon name="close" [size]="16" />
+              </button>
+            </div>
+          }
+          <button app-button variant="secondary" size="sm" type="button" (click)="addFood(meal)">
+            <app-icon name="plus" [size]="16" />
+            Agregar alimento
+          </button>
+        </div>
+
+        <app-form-field
+          label="Notas de la comida"
+          [inputId]="'meal-notes-' + mealIndex"
+          [error]="fieldError(meal, 'notes')"
+        >
+          <input [id]="'meal-notes-' + mealIndex" type="text" formControlName="notes" />
+        </app-form-field>
+      </section>
+    }
+  </div>
+
+  <div>
+    <button app-button variant="secondary" type="button" (click)="addMeal()">
+      <app-icon name="plus" [size]="16" />
+      Agregar comida
+    </button>
+  </div>
+
+  <app-form-field label="Notas generales" inputId="np-notes" [error]="error('notes')">
+    <textarea id="np-notes" formControlName="notes" rows="3"></textarea>
+  </app-form-field>
+
+  <div class="form__actions">
+    <button app-button variant="ghost" type="button" (click)="cancelled.emit()">Cancelar</button>
+    <button app-button type="submit" [loading]="submitting()">Guardar plan</button>
+  </div>
+</form>

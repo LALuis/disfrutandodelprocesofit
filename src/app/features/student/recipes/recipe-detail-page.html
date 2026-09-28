@@ -1,0 +1,72 @@
+<a class="back-link" routerLink="/app/recetario">
+  <app-icon name="arrow-left" [size]="16" />
+  Volver al recetario
+</a>
+
+@if (recipe.isLoading()) {
+  <app-loading-state message="Cargando receta…" />
+} @else if (recipe.error()) {
+  <app-error-state title="No pudimos cargar la receta" (retry)="recipe.reload()" />
+} @else if (recipe.hasValue() && recipe.value(); as r) {
+  <article class="detail">
+    @if (r.imageUrl) {
+      <img class="detail__image" [src]="r.imageUrl" [alt]="r.title" />
+    }
+    <header class="detail__header">
+      <app-badge tone="accent">{{ categoryLabels[r.category] }}</app-badge>
+      <h1 class="detail__title">{{ r.title }}</h1>
+      @if (r.description) {
+        <p class="text-muted">{{ r.description }}</p>
+      }
+      <ul class="facts">
+        <li><app-icon name="clock" [size]="16" /> {{ r.preparationTime }} min</li>
+        @if (r.calories !== null) {
+          <li><app-icon name="flame" [size]="16" /> {{ r.calories }} kcal</li>
+        }
+        @if (r.protein !== null) {
+          <li>Proteínas {{ r.protein }} g</li>
+        }
+        @if (r.carbohydrates !== null) {
+          <li>Carbohidratos {{ r.carbohydrates }} g</li>
+        }
+        @if (r.fat !== null) {
+          <li>Grasas {{ r.fat }} g</li>
+        }
+      </ul>
+      @if (r.tags.length) {
+        <div class="tags">
+          @for (tag of r.tags; track tag) {
+            <app-badge>{{ tag }}</app-badge>
+          }
+        </div>
+      }
+    </header>
+
+    <div class="detail__body">
+      <section>
+        <h2 class="detail__section">Ingredientes</h2>
+        <ul class="ingredients">
+          @for (ingredient of r.ingredients; track $index) {
+            <li>{{ ingredient }}</li>
+          }
+        </ul>
+      </section>
+      <section>
+        <h2 class="detail__section">Preparación</h2>
+        <ol class="steps">
+          @for (step of r.instructions; track $index) {
+            <li>{{ step }}</li>
+          }
+        </ol>
+      </section>
+    </div>
+  </article>
+} @else {
+  <app-empty-state
+    icon="chef-hat"
+    title="Receta no disponible"
+    description="La receta no existe o fue archivada."
+  >
+    <a app-button variant="secondary" routerLink="/app/recetario">Volver al recetario</a>
+  </app-empty-state>
+}

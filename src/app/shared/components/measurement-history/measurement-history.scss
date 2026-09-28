@@ -1,0 +1,60 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
+.history--table {
+  display: none;
+
+  @include bp.up('lg') {
+    display: block;
+  }
+}
+
+.history--cards {
+  @include bp.up('lg') {
+    display: none;
+  }
+}
+
+.history__notes {
+  max-width: 220px;
+  white-space: normal;
+}
+
+.history-card {
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.history-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.history-card__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+
+  dt {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: var(--weight-semibold);
+  }
+}
+
+.history-card__notes {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+}

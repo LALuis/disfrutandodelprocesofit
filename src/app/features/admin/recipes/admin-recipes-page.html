@@ -1,0 +1,99 @@
+<app-page-header
+  eyebrow="Administración"
+  title="Recetario"
+  [subtitle]="recipes.hasValue() ? recipes.value().length + ' recetas' : ''"
+>
+  @if (editing() === undefined) {
+    <button actions app-button type="button" (click)="openCreate()">
+      <app-icon name="plus" [size]="18" />
+      Nueva receta
+    </button>
+  }
+</app-page-header>
+
+@if (editing() !== undefined) {
+  <app-card class="mb-6">
+    <h2 class="recipes__form-title">{{ editing() ? 'Editar receta' : 'Nueva receta' }}</h2>
+    @if (errorMessage()) {
+      <p class="form__error" role="alert">
+        <app-icon name="alert-triangle" [size]="16" />
+        {{ errorMessage() }}
+      </p>
+    }
+    <app-recipe-form
+      [recipe]="editing() ?? null"
+      [submitting]="submitting()"
+      (save)="save($event)"
+      (cancelled)="editing.set(undefined)"
+    />
+  </app-card>
+}
+
+<div class="toolbar">
+  <label class="toolbar__search">
+    <span class="visually-hidden">Buscar receta</span>
+    <input
+      type="search"
+      placeholder="Buscar por título, categoría o etiqueta"
+      [value]="search()"
+      (input)="onSearch($event)"
+    />
+  </label>
+</div>
+
+@if (recipes.isLoading()) {
+  <app-loading-state message="Cargando recetas…" />
+} @else if (recipes.error()) {
+  <app-error-state title="No pudimos cargar las recetas" (retry)="recipes.reload()" />
+} @else if (filtered().length) {
+  <ul class="recipes">
+    @for (recipe of filtered(); track recipe.id) {
+      <li class="recipe" [class.recipe--archived]="!recipe.active">
+        @if (recipe.imageUrl) {
+          <img class="recipe__image" [src]="recipe.imageUrl" alt="" loading="lazy" />
+        } @else {
+          <div class="recipe__image recipe__image--empty">
+            <app-icon name="chef-hat" [size]="24" />
+          </div>
+        }
+        <div class="recipe__main">
+          <div class="recipe__title">
+            <h3>{{ recipe.title }}</h3>
+            <app-badge tone="accent">{{ categoryLabels[recipe.category] }}</app-badge>
+            @if (!recipe.active) {
+              <app-badge tone="neutral">Archivada</app-badge>
+            }
+          </div>
+          <p class="text-muted recipe__meta">
+            {{ recipe.preparationTime }} min · {{ recipe.ingredients.length }} ingredientes
+          </p>
+        </div>
+        <div class="page-actions">
+          <button app-button variant="secondary" size="sm" type="button" (click)="openEdit(recipe)">
+            <app-icon name="pencil" [size]="14" />
+            Editar
+          </button>
+          <button app-button variant="ghost" size="sm" type="button" (click)="toggleActive(recipe)">
+            {{ recipe.active ? 'Archivar' : 'Publicar' }}
+          </button>
+          <button
+            app-button
+            variant="ghost"
+            size="sm"
+            type="button"
+            (click)="remove(recipe)"
+            aria-label="Eliminar receta"
+          >
+            <app-icon name="trash" [size]="14" />
+          </button>
+        </div>
+      </li>
+    }
+  </ul>
+} @else {
+  <app-empty-state
+    icon="chef-hat"
+    [title]="search() ? 'Sin resultados' : 'Todavía no hay recetas'"
+    [description]="search() ? 'Probá con otra búsqueda.' : 'Creá la primera receta del recetario.'"
+  />
+}

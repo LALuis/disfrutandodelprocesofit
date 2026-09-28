@@ -6,53 +6,90 @@
 
   <app-card padding="lg" class="login__card">
     <header class="login__header">
-      <span class="login__mark"><app-icon name="dumbbell" [size]="22" /></span>
-      <h1 class="login__title">Ingresar</h1>
+      <app-brand-logo class="login__mark" [size]="72" [eager]="true" />
+      <h1 class="login__title">{{ resetMode() ? 'Recuperar contraseña' : 'Ingresar' }}</h1>
       <p class="login__subtitle text-muted">
-        Accedé a tu portal de {{ brand.name }} con el email y la contraseña que te dio el gimnasio.
+        @if (resetMode()) {
+          Ingresá tu email y te enviamos un enlace para definir una nueva contraseña.
+        } @else {
+          Accedé a tu portal de {{ brand.name }} con tu email y tu contraseña.
+        }
       </p>
     </header>
 
-    <form class="login__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <app-form-field label="Email" inputId="login-email" [error]="emailError">
-        <input
-          id="login-email"
-          type="email"
-          formControlName="email"
-          autocomplete="username"
-          inputmode="email"
-          placeholder="tu@email.com"
-          [attr.aria-invalid]="emailError ? 'true' : null"
-          [attr.aria-describedby]="emailError ? 'login-email-error' : null"
-        />
-      </app-form-field>
-
-      <app-form-field label="Contraseña" inputId="login-password" [error]="passwordError">
-        <input
-          id="login-password"
-          type="password"
-          formControlName="password"
-          autocomplete="current-password"
-          placeholder="••••••••"
-          [attr.aria-invalid]="passwordError ? 'true' : null"
-          [attr.aria-describedby]="passwordError ? 'login-password-error' : null"
-        />
-      </app-form-field>
-
-      @if (errorMessage()) {
-        <p class="login__error" role="alert">
-          <app-icon name="alert-triangle" [size]="16" />
-          {{ errorMessage() }}
-        </p>
-      }
-
-      <button app-button type="submit" size="lg" [block]="true" [loading]="submitting()">
-        Ingresar
+    @if (resetSent()) {
+      <p class="login__success" role="status">
+        <app-icon name="circle-check" [size]="18" />
+        Si el email está registrado, vas a recibir un enlace para definir tu contraseña.
+      </p>
+      <button
+        app-button
+        variant="secondary"
+        [block]="true"
+        type="button"
+        (click)="toggleResetMode()"
+      >
+        Volver a ingresar
       </button>
-    </form>
+    } @else {
+      <form
+        class="login__form"
+        [formGroup]="form"
+        (ngSubmit)="resetMode() ? sendReset() : submit()"
+        novalidate
+      >
+        <app-form-field label="Email" inputId="login-email" [error]="emailError">
+          <input
+            id="login-email"
+            type="email"
+            formControlName="email"
+            autocomplete="username"
+            inputmode="email"
+            placeholder="tu@email.com"
+            [attr.aria-invalid]="emailError ? 'true' : null"
+            [attr.aria-describedby]="emailError ? 'login-email-error' : null"
+          />
+        </app-form-field>
+
+        @if (!resetMode()) {
+          <app-form-field label="Contraseña" inputId="login-password" [error]="passwordError">
+            <input
+              id="login-password"
+              type="password"
+              formControlName="password"
+              autocomplete="current-password"
+              placeholder="••••••••"
+              [attr.aria-invalid]="passwordError ? 'true' : null"
+              [attr.aria-describedby]="passwordError ? 'login-password-error' : null"
+            />
+          </app-form-field>
+        }
+
+        @if (errorMessage()) {
+          <p class="login__error" role="alert">
+            <app-icon name="alert-triangle" [size]="16" />
+            {{ errorMessage() }}
+          </p>
+        }
+
+        <button app-button type="submit" size="lg" [block]="true" [loading]="submitting()">
+          {{ resetMode() ? 'Enviar enlace' : 'Ingresar' }}
+        </button>
+      </form>
+    }
 
     <p class="login__help text-muted">
-      ¿No tenés cuenta o no recordás tu contraseña? Comunicate con el gimnasio.
+      @if (resetMode()) {
+        <button type="button" class="login__link" (click)="toggleResetMode()">
+          Volver a ingresar
+        </button>
+      } @else {
+        <button type="button" class="login__link" (click)="toggleResetMode()">
+          ¿Olvidaste tu contraseña?
+        </button>
+        <br />
+        ¿No tenés cuenta? Comunicate con el gimnasio.
+      }
     </p>
   </app-card>
 </div>

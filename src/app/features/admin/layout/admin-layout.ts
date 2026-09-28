@@ -3,9 +3,16 @@ import { RouterOutlet } from '@angular/router';
 import { PortalShell } from '@shared/components/portal-shell/portal-shell';
 import { NavItem } from '@shared/models/nav-item';
 
-/** Admin portal navigation. Sections are appended here as their milestones land. */
 const ADMIN_NAV: readonly NavItem[] = [
   { label: 'Dashboard', path: '/admin', icon: 'dashboard', exact: true },
+  { label: 'Alumnos', path: '/admin/alumnos', icon: 'users' },
+  { label: 'Horarios', path: '/admin/horarios', icon: 'clock' },
+  { label: 'Reservas', path: '/admin/reservas', icon: 'calendar' },
+  { label: 'Entrenamiento', path: '/admin/entrenamiento', icon: 'dumbbell' },
+  { label: 'Nutrición', path: '/admin/nutricion', icon: 'salad' },
+  { label: 'Recetario', path: '/admin/recetas', icon: 'chef-hat' },
+  { label: 'Planes', path: '/admin/planes', icon: 'credit-card' },
+  { label: 'Configuración', path: '/admin/configuracion', icon: 'settings' },
 ];
 
 @Component({

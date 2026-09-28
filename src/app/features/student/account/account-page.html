@@ -1,0 +1,88 @@
+<app-page-header eyebrow="Mi cuenta" title="Tu cuenta" subtitle="Datos de acceso y contacto." />
+
+@if (profile(); as p) {
+  <app-card class="mb-6 account">
+    <app-user-avatar [firstName]="p.firstName" [lastName]="p.lastName" [size]="56" />
+    <div>
+      <h2 class="account__name">{{ fullName(p) }}</h2>
+      <p class="text-muted">{{ p.email }}</p>
+    </div>
+  </app-card>
+}
+
+<app-card class="mb-6">
+  <h2 class="account__section">Teléfono de contacto</h2>
+  <form class="form" [formGroup]="phoneForm" (ngSubmit)="savePhone()" novalidate>
+    <app-form-field
+      label="Teléfono"
+      inputId="acc-phone"
+      [error]="phoneError()"
+      hint="Lo usamos para contactarte por tus reservas."
+    >
+      <input id="acc-phone" type="tel" inputmode="tel" formControlName="phone" autocomplete="tel" />
+    </app-form-field>
+    <div class="form__actions">
+      <button
+        app-button
+        variant="secondary"
+        type="submit"
+        [loading]="savingPhone()"
+        [disabled]="!phoneForm.dirty"
+      >
+        Guardar
+      </button>
+    </div>
+  </form>
+</app-card>
+
+<app-card class="mb-6">
+  <h2 class="account__section">Cambiar contraseña</h2>
+  @if (passwordError()) {
+    <p class="form__error" role="alert">
+      <app-icon name="alert-triangle" [size]="16" />
+      {{ passwordError() }}
+    </p>
+  }
+  <form class="form" [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate>
+    <app-form-field label="Contraseña actual" inputId="acc-current" [error]="pwdError('current')">
+      <input
+        id="acc-current"
+        type="password"
+        formControlName="current"
+        autocomplete="current-password"
+      />
+    </app-form-field>
+    <div class="form__grid">
+      <app-form-field
+        label="Nueva contraseña"
+        inputId="acc-next"
+        [error]="pwdError('next')"
+        hint="Mínimo 6 caracteres."
+      >
+        <input id="acc-next" type="password" formControlName="next" autocomplete="new-password" />
+      </app-form-field>
+      <app-form-field
+        label="Repetir nueva contraseña"
+        inputId="acc-confirm"
+        [error]="pwdError('confirm')"
+      >
+        <input
+          id="acc-confirm"
+          type="password"
+          formControlName="confirm"
+          autocomplete="new-password"
+        />
+      </app-form-field>
+    </div>
+    <div class="form__actions">
+      <button app-button type="submit" [loading]="changingPassword()">Actualizar contraseña</button>
+    </div>
+  </form>
+</app-card>
+
+<div class="page-actions">
+  <button app-button variant="ghost" type="button" (click)="signOut()">
+    <app-icon name="log-out" [size]="16" />
+    Cerrar sesión
+  </button>
+</div>

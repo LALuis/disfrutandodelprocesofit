@@ -1,0 +1,39 @@
+<svg
+  class="chart"
+  [attr.viewBox]="'0 0 ' + width + ' ' + height"
+  role="img"
+  [attr.aria-label]="description()"
+  preserveAspectRatio="none"
+>
+  @for (tick of yTicks(); track tick.y) {
+    <line
+      class="chart__grid"
+      [attr.x1]="pad.left"
+      [attr.x2]="width - pad.right"
+      [attr.y1]="tick.y"
+      [attr.y2]="tick.y"
+    />
+    <text class="chart__tick" [attr.x]="pad.left - 8" [attr.y]="tick.y + 4" text-anchor="end">
+      {{ tick.label }}
+    </text>
+  }
+
+  @if (areaPath()) {
+    <path class="chart__area" [attr.d]="areaPath()" />
+  }
+  @if (plotted().length > 1) {
+    <path class="chart__line" [attr.d]="path()" />
+  }
+
+  @for (point of plotted(); track point.label + point.x) {
+    <circle class="chart__dot" [attr.cx]="point.x" [attr.cy]="point.y" r="4">
+      <title>{{ point.label }}: {{ point.value }}{{ unit() }}</title>
+    </circle>
+  }
+
+  @for (point of xLabels(); track point.label + point.x) {
+    <text class="chart__tick" [attr.x]="point.x" [attr.y]="height - 10" text-anchor="middle">
+      {{ point.label }}
+    </text>
+  }
+</svg>

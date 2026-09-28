@@ -29,14 +29,7 @@
 }
 
 .shell__brand-mark {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
   flex-shrink: 0;
-  border-radius: var(--radius-sm);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
 }
 
 .shell__brand-text {
@@ -124,8 +117,8 @@
   }
 }
 
-// Drawer mode: the sidebar slides in from the left on small screens.
-:host:not(.shell--tabs) .shell__sidebar {
+// On small screens the sidebar becomes a drawer (hamburger in drawer mode, "Más" tab in tabs mode).
+.shell__sidebar {
   @include bp.down('lg') {
     display: block;
     position: fixed;
@@ -143,7 +136,7 @@
   }
 }
 
-:host:not(.shell--tabs) .shell__sidebar--open {
+.shell__sidebar--open {
   @include bp.down('lg') {
     transform: translateX(0);
     visibility: visible;
@@ -151,9 +144,18 @@
   }
 }
 
+:host(.shell--tabs) .shell__sidebar,
+:host(.shell--tabs) .shell__backdrop {
+  @include bp.down('lg') {
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+  }
+}
+
 .shell__backdrop {
   position: fixed;
   inset: var(--header-height) 0 0 0;
+  border: 0;
+  padding: 0;
   z-index: calc(var(--z-dropdown) - 1);
   background: var(--color-overlay);
 

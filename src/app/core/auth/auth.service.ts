@@ -1,5 +1,14 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
-import { onIdTokenChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import {
+  EmailAuthProvider,
+  onIdTokenChanged,
+  reauthenticateWithCredential,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+  updatePassword,
+  User,
+} from 'firebase/auth';
 import { Observable, ReplaySubject } from 'rxjs';
 import { FIREBASE_AUTH } from '@core/firebase/firebase.tokens';
 import { AuthUser, parseUserRole, ROLE_CLAIM } from './auth.models';
@@ -45,6 +54,24 @@ export class AuthService {
 
   async signOut(): Promise<void> {
     await signOut(this.auth);
+  }
+
+  /** Sends the standard Firebase reset email (also used as the onboarding "set password" flow). */
+  async sendPasswordReset(email: string): Promise<void> {
+    await sendPasswordResetEmail(this.auth, email.trim());
+  }
+
+  /** Re-authenticates with the current password (Firebase requires a recent login) then updates it. */
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user?.email) {
+      throw new Error('No hay una sesión activa.');
+    }
+    await reauthenticateWithCredential(
+      user,
+      EmailAuthProvider.credential(user.email, currentPassword),
+    );
+    await updatePassword(user, newPassword);
   }
 
   /** Forces a token refresh so recently changed custom claims become visible. */

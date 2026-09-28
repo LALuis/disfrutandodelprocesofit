@@ -1,0 +1,55 @@
+<app-page-header
+  eyebrow="Mi progreso"
+  title="Tu evolución"
+  subtitle="Comparación con la medición anterior y evolución en el tiempo."
+/>
+
+@if (history.isLoading()) {
+  <app-loading-state message="Cargando tu progreso…" />
+} @else if (history.error()) {
+  <app-error-state title="No pudimos cargar tus mediciones" (retry)="history.reload()" />
+} @else if (series().length) {
+  @for (s of series(); track s.metric) {
+    <section class="metric">
+      <h2 class="metric__title">{{ meta[s.metric].label }}</h2>
+      <div class="metric__stats">
+        <app-stat-card
+          label="Actual"
+          [value]="s.comparison.current ?? '–'"
+          [unit]="meta[s.metric].unit"
+          tone="accent"
+        />
+        <app-stat-card
+          label="Anterior"
+          [value]="s.comparison.previous ?? '–'"
+          [unit]="s.comparison.previous !== null ? meta[s.metric].unit : ''"
+        />
+        <app-stat-card
+          label="Cambio"
+          [value]="signed(s.comparison.change)"
+          [unit]="s.comparison.change !== null ? meta[s.metric].unit : ''"
+          [tone]="changeTone(s.comparison.change, s.metric)"
+        />
+      </div>
+      <app-card padding="sm">
+        @if (s.points.length > 1) {
+          <app-line-chart
+            [points]="s.points"
+            [unit]="' ' + meta[s.metric].unit"
+            [title]="meta[s.metric].label"
+          />
+        } @else {
+          <p class="text-muted metric__single">
+            Con una segunda medición vas a ver el gráfico de evolución.
+          </p>
+        }
+      </app-card>
+    </section>
+  }
+} @else {
+  <app-empty-state
+    icon="line-chart"
+    title="Todavía no hay mediciones"
+    description="Cuando tu coach registre tu primera medición, vas a ver acá tu evolución."
+  />
+}

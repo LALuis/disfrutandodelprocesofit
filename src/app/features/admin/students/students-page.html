@@ -1,0 +1,76 @@
+<app-page-header
+  eyebrow="Administración"
+  title="Alumnos"
+  [subtitle]="students.hasValue() ? students.value().length + ' alumnos registrados' : ''"
+>
+  <a actions app-button routerLink="nuevo">
+    <app-icon name="plus" [size]="18" />
+    Nuevo alumno
+  </a>
+</app-page-header>
+
+<div class="toolbar">
+  <label class="toolbar__search">
+    <span class="visually-hidden">Buscar alumno</span>
+    <input
+      type="search"
+      placeholder="Buscar por nombre, email o teléfono"
+      [value]="search()"
+      (input)="onSearch($event)"
+    />
+  </label>
+  <label>
+    <span class="visually-hidden">Estado</span>
+    <select [value]="status()" (change)="onStatus($event)">
+      <option value="all">Todos</option>
+      <option value="active">Activos</option>
+      <option value="inactive">Deshabilitados</option>
+    </select>
+  </label>
+</div>
+
+@if (students.isLoading()) {
+  <app-loading-state message="Cargando alumnos…" />
+} @else if (students.error()) {
+  <app-error-state title="No pudimos cargar los alumnos" (retry)="students.reload()" />
+} @else if (filtered().length === 0) {
+  <app-empty-state
+    icon="users"
+    [title]="search() || status() !== 'all' ? 'Sin resultados' : 'Todavía no hay alumnos'"
+    [description]="
+      search() || status() !== 'all'
+        ? 'Probá con otra búsqueda o filtro.'
+        : 'Creá el primer alumno para empezar a gestionar el gimnasio.'
+    "
+  >
+    @if (!search() && status() === 'all') {
+      <a app-button routerLink="nuevo">Nuevo alumno</a>
+    }
+  </app-empty-state>
+} @else {
+  <ul class="students">
+    @for (student of filtered(); track student.id) {
+      <li>
+        <a class="student" [routerLink]="[student.id]">
+          <app-user-avatar [firstName]="student.firstName" [lastName]="student.lastName" />
+          <span class="student__main">
+            <span class="student__name">{{ fullName(student) }}</span>
+            <span class="student__email">{{ student.email }}</span>
+          </span>
+          <span class="student__badges">
+            @if (!student.active) {
+              <app-badge tone="error">Deshabilitado</app-badge>
+            }
+            @if (student.features.nutritionEnabled) {
+              <app-badge tone="info">Nutrición</app-badge>
+            }
+            @if (student.features.recipesEnabled) {
+              <app-badge tone="accent">Recetario</app-badge>
+            }
+          </span>
+          <app-icon class="student__chevron" name="chevron-right" [size]="18" />
+        </a>
+      </li>
+    }
+  </ul>
+}

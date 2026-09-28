@@ -1,0 +1,143 @@
+<app-page-header
+  eyebrow="Administración"
+  title="Planes de membresía"
+  subtitle="Los planes activos se muestran en el sitio público, ordenados por posición."
+>
+  @if (editing() === undefined) {
+    <button actions app-button type="button" (click)="openCreate()">
+      <app-icon name="plus" [size]="18" />
+      Nuevo plan
+    </button>
+  }
+</app-page-header>
+
+@if (editing() !== undefined) {
+  <app-card class="mb-6">
+    <h2 class="plans__form-title">{{ editing() ? 'Editar plan' : 'Nuevo plan' }}</h2>
+    @if (errorMessage()) {
+      <p class="form__error" role="alert">
+        <app-icon name="alert-triangle" [size]="16" />
+        {{ errorMessage() }}
+      </p>
+    }
+    <form class="form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <div class="form__grid">
+        <app-form-field label="Nombre" inputId="mp-name" [error]="error('name')">
+          <input id="mp-name" type="text" formControlName="name" />
+        </app-form-field>
+        <app-form-field label="Descripción" inputId="mp-description" [error]="error('description')">
+          <input id="mp-description" type="text" formControlName="description" />
+        </app-form-field>
+      </div>
+      <div class="form__grid form__grid--3">
+        <app-form-field label="Precio" inputId="mp-price" [error]="error('price')">
+          <input
+            id="mp-price"
+            type="number"
+            min="0"
+            step="1"
+            inputmode="numeric"
+            formControlName="price"
+          />
+        </app-form-field>
+        <app-form-field label="Moneda" inputId="mp-currency" [error]="error('currency')">
+          <input id="mp-currency" type="text" maxlength="3" formControlName="currency" />
+        </app-form-field>
+        <app-form-field label="Frecuencia" inputId="mp-frequency">
+          <select id="mp-frequency" formControlName="frequency">
+            @for (frequency of frequencies; track frequency) {
+              <option [value]="frequency">{{ frequencyLabels[frequency] }}</option>
+            }
+          </select>
+        </app-form-field>
+      </div>
+      <app-form-field
+        label="Beneficios"
+        inputId="mp-features"
+        [error]="error('features')"
+        hint="Uno por línea."
+      >
+        <textarea id="mp-features" formControlName="features" rows="4"></textarea>
+      </app-form-field>
+      <div class="form__grid form__grid--3">
+        <app-form-field label="Posición" inputId="mp-order" [error]="error('displayOrder')">
+          <input
+            id="mp-order"
+            type="number"
+            min="0"
+            inputmode="numeric"
+            formControlName="displayOrder"
+          />
+        </app-form-field>
+        <label class="checkbox">
+          <input type="checkbox" formControlName="highlighted" />
+          <span>Destacado ("Más elegido")</span>
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" formControlName="active" />
+          <span>Activo (visible en el sitio)</span>
+        </label>
+      </div>
+      <div class="form__actions">
+        <button app-button variant="ghost" type="button" (click)="editing.set(undefined)">
+          Cancelar
+        </button>
+        <button app-button type="submit" [loading]="submitting()">Guardar plan</button>
+      </div>
+    </form>
+  </app-card>
+}
+
+@if (plans.isLoading()) {
+  <app-loading-state message="Cargando planes…" />
+} @else if (plans.error()) {
+  <app-error-state title="No pudimos cargar los planes" (retry)="plans.reload()" />
+} @else if (plans.hasValue() && plans.value().length) {
+  <ul class="plans">
+    @for (plan of plans.value(); track plan.id) {
+      <li class="plan" [class.plan--inactive]="!plan.active">
+        <span class="plan__order">{{ plan.displayOrder }}</span>
+        <div class="plan__main">
+          <div class="plan__title">
+            <h3>{{ plan.name }}</h3>
+            @if (plan.highlighted) {
+              <app-badge tone="accent">Destacado</app-badge>
+            }
+            @if (!plan.active) {
+              <app-badge tone="neutral">Inactivo</app-badge>
+            }
+          </div>
+          <p class="text-muted plan__meta">
+            {{ plan.price | appPrice: plan.currency }} {{ frequencyLabels[plan.frequency] }} ·
+            {{ plan.features.length }} beneficios
+          </p>
+        </div>
+        <div class="page-actions">
+          <button app-button variant="secondary" size="sm" type="button" (click)="openEdit(plan)">
+            <app-icon name="pencil" [size]="14" />
+            Editar
+          </button>
+          <button app-button variant="ghost" size="sm" type="button" (click)="toggleActive(plan)">
+            {{ plan.active ? 'Desactivar' : 'Activar' }}
+          </button>
+          <button
+            app-button
+            variant="ghost"
+            size="sm"
+            type="button"
+            (click)="remove(plan)"
+            aria-label="Eliminar plan"
+          >
+            <app-icon name="trash" [size]="14" />
+          </button>
+        </div>
+      </li>
+    }
+  </ul>
+} @else {
+  <app-empty-state
+    icon="credit-card"
+    title="Todavía no hay planes"
+    description="Creá el primer plan de membresía para mostrarlo en el sitio."
+  />
+}

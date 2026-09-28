@@ -1,0 +1,64 @@
+@if (showHeader()) {
+  <header class="plan__header">
+    <div>
+      <h2 class="plan__name">{{ plan().title }}</h2>
+      @if (plan().objective) {
+        <p class="plan__objective">Objetivo: {{ plan().objective }}</p>
+      }
+      @if (plan().description) {
+        <p class="text-muted">{{ plan().description }}</p>
+      }
+    </div>
+    <div class="plan__meta">
+      <app-badge [tone]="plan().active ? 'success' : 'neutral'">{{
+        plan().active ? 'Activo' : 'Finalizado'
+      }}</app-badge>
+      <span class="text-muted">
+        {{ formatDate(plan().startDate) }}
+        @if (plan().endDate) {
+          – {{ formatDate(plan().endDate) }}
+        }
+      </span>
+    </div>
+  </header>
+}
+
+<div class="meals">
+  @for (meal of plan().meals; track meal.id) {
+    <article class="meal">
+      <header class="meal__head">
+        <span class="meal__type">{{ mealLabels[meal.type] }}</span>
+        @if (meal.name) {
+          <h3 class="meal__name">{{ meal.name }}</h3>
+        }
+      </header>
+      @if (meal.description) {
+        <p class="text-muted meal__description">{{ meal.description }}</p>
+      }
+      @if (meal.foods.length) {
+        <ul class="foods">
+          @for (food of meal.foods; track $index) {
+            <li class="food">
+              <span class="food__name">{{ food.name }}</span>
+              @if (food.quantity) {
+                <span class="food__quantity">{{ food.quantity }}</span>
+              }
+              @if (food.notes) {
+                <span class="food__notes text-muted">{{ food.notes }}</span>
+              }
+            </li>
+          }
+        </ul>
+      }
+      @if (meal.notes) {
+        <p class="meal__notes text-muted">{{ meal.notes }}</p>
+      }
+    </article>
+  } @empty {
+    <p class="text-muted">Este plan todavía no tiene comidas cargadas.</p>
+  }
+</div>
+
+@if (plan().notes) {
+  <p class="plan__notes">{{ plan().notes }}</p>
+}

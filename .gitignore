@@ -62,3 +62,7 @@ database-debug.log
 
 # Claude Code local tooling
 /.claude/
+
+# Derived from brand/logo-original.png by scripts/brand (regenerable, large)
+/brand/logo-merch.svg
+/brand/logo-trace.svg

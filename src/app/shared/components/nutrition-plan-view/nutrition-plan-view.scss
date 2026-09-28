@@ -1,0 +1,104 @@
+:host {
+  display: block;
+}
+
+.plan__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.plan__name {
+  font-size: var(--text-xl);
+}
+
+.plan__objective {
+  color: var(--color-accent);
+  font-weight: var(--weight-medium);
+}
+
+.plan__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.meals {
+  display: grid;
+  gap: var(--space-3);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.meal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.meal__type {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.meal__name {
+  font-size: var(--text-lg);
+}
+
+.meal__description,
+.meal__notes {
+  font-size: var(--text-sm);
+}
+
+.foods {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.food {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px dashed var(--color-border);
+  font-size: var(--text-sm);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.food__name {
+  font-weight: var(--weight-medium);
+}
+
+.food__quantity {
+  color: var(--color-text-muted);
+}
+
+.food__notes {
+  width: 100%;
+  font-size: var(--text-xs);
+}
+
+.plan__notes {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  font-size: var(--text-sm);
+}

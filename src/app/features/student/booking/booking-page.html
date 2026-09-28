@@ -1,0 +1,116 @@
+<app-page-header
+  eyebrow="Agenda"
+  title="Reservá tu turno"
+  subtitle="Elegí el día y el horario. El cupo se confirma en el momento."
+/>
+
+<div class="days" role="tablist" aria-label="Elegir día">
+  @for (day of days; track day.iso) {
+    <button
+      type="button"
+      role="tab"
+      class="day"
+      [class.day--selected]="selectedDate() === day.iso"
+      [attr.aria-selected]="selectedDate() === day.iso"
+      [attr.aria-label]="formatDate(day.iso)"
+      (click)="selectedDate.set(day.iso)"
+    >
+      <span class="day__weekday">{{ day.weekday }}</span>
+      <span class="day__number">{{ day.day }}</span>
+      @if (day.iso === today) {
+        <span class="day__today">Hoy</span>
+      }
+    </button>
+  }
+</div>
+
+<h2 class="section-title">{{ formatDate(selectedDate()) }}</h2>
+
+@if (slots.isLoading()) {
+  <app-loading-state message="Buscando horarios…" />
+} @else if (slots.error()) {
+  <app-error-state title="No pudimos cargar los horarios" (retry)="slots.reload()" />
+} @else if (visibleSlots().length) {
+  <ul class="slots">
+    @for (slot of visibleSlots(); track slot.id) {
+      <li class="slot" [class.slot--booked]="isBooked(slot)">
+        <div class="slot__time">
+          <strong>{{ slot.startTime }}</strong>
+          <span class="text-muted">{{ slot.durationMinutes }} min</span>
+        </div>
+        <div class="slot__status">
+          @if (isBooked(slot)) {
+            <app-badge tone="accent"><app-icon name="check" [size]="12" /> Reservado</app-badge>
+          } @else if (isFull(slot)) {
+            <app-badge tone="error">Completo</app-badge>
+          } @else {
+            <app-badge tone="success"
+              >{{ remaining(slot) }} {{ remaining(slot) === 1 ? 'lugar' : 'lugares' }}</app-badge
+            >
+          }
+        </div>
+        <div class="slot__action">
+          @if (isBooked(slot)) {
+            <button
+              app-button
+              variant="ghost"
+              size="sm"
+              type="button"
+              [loading]="busySlotId() === slot.id"
+              (click)="cancel({ slotId: slot.id, date: slot.date, startTime: slot.startTime })"
+            >
+              Cancelar
+            </button>
+          } @else {
+            <button
+              app-button
+              size="sm"
+              type="button"
+              [disabled]="isFull(slot)"
+              [loading]="busySlotId() === slot.id"
+              (click)="book(slot)"
+            >
+              Reservar
+            </button>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+} @else {
+  <app-empty-state
+    icon="calendar"
+    title="No hay turnos disponibles"
+    description="Probá con otro día o consultá en el gimnasio."
+  />
+}
+
+<section class="mine">
+  <h2 class="section-title">Mis próximas reservas</h2>
+  @if (bookings.isLoading()) {
+    <app-loading-state message="Cargando tus reservas…" />
+  } @else if (upcoming().length) {
+    <app-booking-list
+      [bookings]="upcoming()"
+      [canCancel]="true"
+      [busySlotId]="busySlotId()"
+      (cancelBooking)="cancel($event)"
+    />
+  } @else {
+    <p class="text-muted">Todavía no tenés reservas próximas.</p>
+  }
+
+  @if (past().length) {
+    <button
+      class="mine__toggle"
+      type="button"
+      (click)="showPast.set(!showPast())"
+      [attr.aria-expanded]="showPast()"
+    >
+      {{ showPast() ? 'Ocultar historial' : 'Ver historial (' + past().length + ')' }}
+    </button>
+    @if (showPast()) {
+      <app-booking-list [bookings]="past()" />
+    }
+  }
+</section>

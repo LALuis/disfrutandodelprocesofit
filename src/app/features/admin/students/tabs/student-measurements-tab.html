@@ -1,0 +1,71 @@
+<div class="page-actions mb-4">
+  <button
+    app-button
+    type="button"
+    [variant]="formOpen() ? 'secondary' : 'primary'"
+    (click)="formOpen.set(!formOpen())"
+  >
+    <app-icon [name]="formOpen() ? 'close' : 'plus'" [size]="18" />
+    {{ formOpen() ? 'Cancelar' : 'Nueva medición' }}
+  </button>
+</div>
+
+@if (formOpen()) {
+  <app-card class="mb-6">
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      @if (errorMessage()) {
+        <p class="form__error" role="alert">
+          <app-icon name="alert-triangle" [size]="16" />
+          {{ errorMessage() }}
+        </p>
+      }
+      <div class="form__grid form__grid--3">
+        <app-form-field label="Fecha" inputId="m-date" [error]="error('date')">
+          <input id="m-date" type="date" formControlName="date" />
+        </app-form-field>
+      </div>
+      <div class="form__grid form__grid--3" formGroupName="metrics">
+        @for (metric of metrics; track metric) {
+          <app-form-field
+            [label]="meta[metric].label + ' (' + meta[metric].unit + ')'"
+            [inputId]="'m-' + metric"
+            [error]="metricError(metric)"
+          >
+            <input
+              [id]="'m-' + metric"
+              type="number"
+              step="0.1"
+              min="0"
+              inputmode="decimal"
+              [formControlName]="metric"
+            />
+          </app-form-field>
+        }
+      </div>
+      <app-form-field label="Notas" inputId="m-notes" [error]="error('notes')">
+        <textarea id="m-notes" formControlName="notes" rows="2"></textarea>
+      </app-form-field>
+      <div class="form__actions">
+        <button app-button type="submit" [loading]="submitting()">Guardar medición</button>
+      </div>
+    </form>
+  </app-card>
+}
+
+@if (history.isLoading()) {
+  <app-loading-state message="Cargando mediciones…" />
+} @else if (history.error()) {
+  <app-error-state title="No pudimos cargar las mediciones" (retry)="history.reload()" />
+} @else if (history.hasValue() && history.value().length) {
+  <app-measurement-history
+    [measurements]="history.value()"
+    [canDelete]="true"
+    (remove)="remove($event)"
+  />
+} @else {
+  <app-empty-state
+    icon="ruler"
+    title="Sin mediciones"
+    description="Registrá la primera medición para empezar a seguir el progreso."
+  />
+}

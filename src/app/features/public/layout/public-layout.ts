@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 import { homeRouteForRole } from '@core/auth/auth.models';
 import { AuthService } from '@core/auth/auth.service';
 import { GymSettingsService } from '@core/services/gym-settings.service';
+import { BrandLogo } from '@shared/components/brand-logo/brand-logo';
 import { Button } from '@shared/components/button/button';
 import { Icon } from '@shared/components/icon/icon';
 import { SocialLinks } from '@shared/components/social-links/social-links';
@@ -22,7 +23,7 @@ const NAV_ITEMS: readonly NavItem[] = [
 
 @Component({
   selector: 'app-public-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, Icon, SocialLinks],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, BrandLogo, Button, Icon, SocialLinks],
   templateUrl: './public-layout.html',
   styleUrl: './public-layout.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

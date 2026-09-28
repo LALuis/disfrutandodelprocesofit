@@ -1,0 +1,80 @@
+<app-page-header
+  eyebrow="Recetario"
+  title="Recetas"
+  subtitle="Ideas simples y ricas para acompañar tu plan."
+/>
+
+<div class="toolbar">
+  <label class="toolbar__search">
+    <span class="visually-hidden">Buscar receta</span>
+    <input
+      type="search"
+      placeholder="Buscar por nombre o ingrediente"
+      [value]="search()"
+      (input)="onSearch($event)"
+    />
+  </label>
+</div>
+
+<div class="chips" role="group" aria-label="Filtrar por categoría">
+  <button
+    type="button"
+    class="chip"
+    [class.chip--active]="category() === 'all'"
+    (click)="category.set('all')"
+  >
+    Todas
+  </button>
+  @for (c of categories; track c) {
+    <button
+      type="button"
+      class="chip"
+      [class.chip--active]="category() === c"
+      (click)="category.set(c)"
+    >
+      {{ categoryLabels[c] }}
+    </button>
+  }
+</div>
+
+@if (recipes.isLoading()) {
+  <app-loading-state message="Cargando recetas…" />
+} @else if (recipes.error()) {
+  <app-error-state title="No pudimos cargar las recetas" (retry)="recipes.reload()" />
+} @else if (filtered().length) {
+  <ul class="recipes">
+    @for (recipe of filtered(); track recipe.id) {
+      <li>
+        <a class="recipe" [routerLink]="[recipe.id]">
+          @if (recipe.imageUrl) {
+            <img class="recipe__image" [src]="recipe.imageUrl" alt="" loading="lazy" />
+          } @else {
+            <div class="recipe__image recipe__image--empty">
+              <app-icon name="chef-hat" [size]="28" />
+            </div>
+          }
+          <div class="recipe__body">
+            <app-badge tone="accent">{{ categoryLabels[recipe.category] }}</app-badge>
+            <h2 class="recipe__title">{{ recipe.title }}</h2>
+            <p class="recipe__meta text-muted">
+              <app-icon name="clock" [size]="14" /> {{ recipe.preparationTime }} min
+              @if (recipe.calories !== null) {
+                · <app-icon name="flame" [size]="14" /> {{ recipe.calories }} kcal
+              }
+            </p>
+          </div>
+        </a>
+      </li>
+    }
+  </ul>
+} @else {
+  <app-empty-state
+    icon="chef-hat"
+    [title]="search() || category() !== 'all' ? 'Sin resultados' : 'Todavía no hay recetas'"
+    [description]="
+      search() || category() !== 'all'
+        ? 'Probá con otra búsqueda o categoría.'
+        : 'Pronto vas a encontrar recetas acá.'
+    "
+  />
+}

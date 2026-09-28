@@ -1,32 +1,35 @@
 <!-- Hero -->
 <section class="hero">
-  <div class="container hero__inner">
-    <span class="eyebrow">{{ settings().gymName }}</span>
-    <h1 class="hero__title">
-      {{ heroTitle().lead }}
-      @if (heroTitle().accent) {
-        <br />
-        <span class="text-accent">{{ heroTitle().accent }}</span>
-      }
-    </h1>
-    <p class="hero__subtitle">{{ settings().heroSubtitle }}</p>
-    <div class="hero__actions">
-      <a app-button variant="primary" size="lg" routerLink="/planes">
-        Conocé nuestros planes
-        <app-icon name="arrow-right" [size]="18" />
-      </a>
-      <a app-button variant="secondary" size="lg" routerLink="/login">Ingresar</a>
-      <a
-        app-button
-        variant="ghost"
-        size="lg"
-        routerLink="/login"
-        [queryParams]="{ redirectTo: '/app' }"
-      >
-        <app-icon name="calendar" [size]="18" />
-        Agendate
-      </a>
+  <div class="container hero__grid">
+    <div class="hero__inner">
+      <span class="eyebrow">{{ settings().gymName }}</span>
+      <h1 class="hero__title">
+        {{ heroTitle().lead }}
+        @if (heroTitle().accent) {
+          <br />
+          <span class="text-accent">{{ heroTitle().accent }}</span>
+        }
+      </h1>
+      <p class="hero__subtitle">{{ settings().heroSubtitle }}</p>
+      <div class="hero__actions">
+        <a app-button variant="primary" size="lg" routerLink="/planes">
+          Conocé nuestros planes
+          <app-icon name="arrow-right" [size]="18" />
+        </a>
+        <a app-button variant="secondary" size="lg" routerLink="/login">Ingresar</a>
+        <a
+          app-button
+          variant="ghost"
+          size="lg"
+          routerLink="/login"
+          [queryParams]="{ redirectTo: '/app' }"
+        >
+          <app-icon name="calendar" [size]="18" />
+          Agendate
+        </a>
+      </div>
     </div>
+    <app-brand-logo class="hero__logo" variant="full" [size]="380" [eager]="true" />
   </div>
 </section>
 

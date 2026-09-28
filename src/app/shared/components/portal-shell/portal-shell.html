@@ -13,7 +13,7 @@
   }
 
   <a class="shell__brand" routerLink="/">
-    <span class="shell__brand-mark"><app-icon name="dumbbell" [size]="18" /></span>
+    <app-brand-logo class="shell__brand-mark" [size]="36" [eager]="true" />
     <span class="shell__brand-text">
       <span class="shell__brand-name">{{ brand.shortName }}</span>
       <span class="shell__brand-area">{{ areaLabel() }}</span>
@@ -63,7 +63,7 @@
     </ul>
   </nav>
 
-  @if (mobileNav() === 'drawer' && drawerOpen()) {
+  @if (drawerOpen()) {
     <button
       type="button"
       class="shell__backdrop"
@@ -79,7 +79,7 @@
 
 @if (mobileNav() === 'tabs') {
   <nav class="shell__tabs" [attr.aria-label]="'Navegación de ' + areaLabel()">
-    @for (item of navItems(); track item.path) {
+    @for (item of primaryTabs(); track item.path) {
       <a
         class="shell__tab"
         [routerLink]="item.path"
@@ -90,6 +90,19 @@
         <app-icon [name]="item.icon" [size]="22" />
         <span>{{ item.label }}</span>
       </a>
+    }
+    @if (hasOverflow()) {
+      <button
+        type="button"
+        class="shell__tab"
+        [class.shell__tab--active]="drawerOpen()"
+        [attr.aria-expanded]="drawerOpen()"
+        aria-controls="portal-drawer"
+        (click)="toggleDrawer()"
+      >
+        <app-icon [name]="drawerOpen() ? 'close' : 'menu'" [size]="22" />
+        <span>Más</span>
+      </button>
     }
   </nav>
 }

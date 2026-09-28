@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { doc } from 'firebase/firestore';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { catchError, map, Observable, of, shareReplay } from 'rxjs';
 import { documentData$ } from '@core/firebase/firestore.utils';
 import { FIRESTORE } from '@core/firebase/firebase.tokens';
@@ -42,4 +42,12 @@ export class GymSettingsService {
 
   /** Signal view of `settings$`, seeded with the defaults so templates can render immediately. */
   readonly settings = toSignal(this.settings$, { initialValue: DEFAULT_GYM_SETTINGS });
+
+  async save(settings: GymSettings): Promise<void> {
+    await setDoc(
+      doc(this.firestore, GYM_SETTINGS_COLLECTION, PUBLIC_SETTINGS_DOC),
+      { ...settings, updatedAt: serverTimestamp() },
+      { merge: true },
+    );
+  }
 }
